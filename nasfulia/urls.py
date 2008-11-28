@@ -8,10 +8,13 @@ urlpatterns = patterns('',
     # Example:
     # (r'^nasfulia/', include('nasfulia.foo.urls')),
 
-    # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
+    # Uncomment the admin/doc line below and add 'django.contrib.admindocs'
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
     # (r'^admin/(.*)', admin.site.root),
+    (r'^users/(?P<user_id>[^\/]+)/accounts$', 'nasfulia.main.views.Accounts.dispatch'),
+    (r'^users/(?P<user_id>[^\/]+)/accounts/(?P<id>\d+)$', 'nasfulia.main.views.Accounts.dispatch'),
 )
+
