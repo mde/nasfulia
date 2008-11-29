@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.http import Http404
+from django.shortcuts import render_to_response
 
 class dispatcher:
     def __init__(self, member_class):
@@ -25,16 +26,10 @@ class dispatcher:
 
         raise Http404
 
-def GET(request, user_id):
-    return HttpResponse('Yay, ' + user_id)
-
-def POST(request):
-    # to help with initial debugging...
-    return HttpResponse('POST: Accounts')
-
 class Account:
     def index(self, request, user_id):
-        return HttpResponse('index ' + user_id)
+        #return HttpResponse('index ' + user_id)
+        return render_to_response('accounts/index.html', {'user_id': user_id})
 
     def create(self, request, user_id):
         return HttpResponse('create ' + user_id)

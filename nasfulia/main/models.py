@@ -13,6 +13,7 @@ class Account(models.Model):
     username = models.CharField(max_length=255)
     crypted_password = models.CharField(max_length=255)
     enabled = models.BooleanField(default=True)
+    post_only = models.BooleanField(default=True)
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField()
 

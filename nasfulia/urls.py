@@ -16,5 +16,7 @@ urlpatterns = patterns('',
     # (r'^admin/(.*)', admin.site.root),
     (r'^users/(?P<user_id>[^\/]+)/accounts$', 'nasfulia.main.views.Accounts.dispatch'),
     (r'^users/(?P<user_id>[^\/]+)/accounts/(?P<id>\d+)$', 'nasfulia.main.views.Accounts.dispatch'),
+    (r'^login/$', 'django.contrib.auth.views.login'),
+    (r'^home$', 'nasfulia.main.views.Main.home'),
 )
 
