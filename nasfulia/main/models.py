@@ -25,4 +25,9 @@ class Track(models.Model):
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField()
 
-
+class Profile(models.Model):
+    user = models.ForeignKey(User, unique=True)
+    profile_image_url = models.CharField(max_length=255)
+    description  = models.CharField(max_length=255)
+    location  = models.CharField(max_length=255)
+    url =  models.CharField(max_length=255)
