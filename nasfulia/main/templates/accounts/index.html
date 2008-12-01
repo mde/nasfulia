@@ -1,1 +1,62 @@
-Howdy, {{user_id}}.
+<!DOCTYPE html
+   PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title></title>
+
+<script type="text/javascript"
+  src="/site_media/js/lib/fleegix_js/fleegix.js"></script>
+
+<script type="text/javascript">
+  var nasfulia = {};
+  nasfulia.account = new function () {
+    this.init = function () {
+    };
+  };
+  fleegix.event.listen(window, 'onload', nasfulia.account, 'init');
+</script>
+
+<style type="text/css">
+  * {
+    font-family: "Lucida Grande", "Verdana", sans-serif;
+  }
+  a {
+    color: #864612;
+    cursor: pointer;
+    border-style: dotted;
+    border-width: 0 0 1px 0;
+    text-decoration: none;
+  }
+  a:hover {
+    border-style: solid;
+  }
+  a img {
+    border: 0;
+  }
+</style>
+
+</head>
+  <body>
+  <div>
+    <a href="/home">
+      Home
+    </a>
+  </div>
+  <div>
+    <form method="post">
+      <input type="button" value="New Account"/>
+    </form>
+  </div>
+  {% if not accounts|length %}
+  (You currently have no accounts set up.)
+  {% else %}
+    {% for a in account %}
+   
+    {% endfor %}
+  {% endif %}
+  </body>
+</html>
+

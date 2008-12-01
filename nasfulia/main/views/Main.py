@@ -12,6 +12,7 @@ def profile(request):
     id = request.session.get('_auth_user_id')
     user = User.objects.get(id=id)
     accounts = Account.objects.filter(user__id=id)
+    request.session['accounts'] = accounts
     # User has service accounts set up, send them
     # into the app
     if len(accounts) > 0:
@@ -20,3 +21,5 @@ def profile(request):
     else:
         return HttpResponseRedirect('/users/' +
             user.username + '/accounts')
+
+

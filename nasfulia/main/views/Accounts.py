@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.http import Http404
 from django.shortcuts import render_to_response
+from django.core import serializers
 
 class dispatcher:
     def __init__(self, member_class):
@@ -27,9 +28,18 @@ class dispatcher:
         raise Http404
 
 class Account:
-    def index(self, request, user_id):
-        #return HttpResponse('index ' + user_id)
-        return render_to_response('accounts/index.html', {'user_id': user_id})
+    def index(self, request, user_id, format):
+        accounts = request.session['accounts']
+        # File extension -- json/xml
+        if format:
+            accounts = serializers.serialize(format, accounts)
+            return HttpResponse(accounts, mimetype='application/' + format)
+        # No extension, render template
+        else:
+            return render_to_response('accounts/index.html', {
+                'request': request,
+                'accounts': accounts,
+                'user_id': user_id })
 
     def create(self, request, user_id):
         return HttpResponse('create ' + user_id)
