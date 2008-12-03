@@ -8,13 +8,39 @@
 <title></title>
 
 <script type="text/javascript"
-  src="/site_media/js/lib/fleegix_js/fleegix.js"></script>
-
+  src="/site_media/js/lib/jquery/jquery-1.2.6.js"></script>
+<script type="text/javascript" charset="utf-8">
+  jQuery.noConflict();
+</script>
+<script type="text/javascript"
+  src="/site_media/js/lib/jquery/jquery-ui/jquery-ui-1.6rc2.js"></script>
+<script type="text/javascript"
+  src="/site_media/js/lib/fleegix_js/fleegix.js"></script>  
+    
 <script type="text/javascript">
   var nasfulia = {};
   nasfulia.account = new function () {
     var _this = this;
+    
+    this.buildAcctDialog = function (){
+       jQuery("#acctDialog").dialog({
+          height: 450,
+          width: 600,
+          modal:true,
+          overlay: { 
+            opacity: 0.5, 
+            background: "black" 
+          },
+          buttons: { 
+           "Ok": function() { 
+             jQuery(this).dialog("close"); 
+           }
+          }
+        });
+    };
+    
     this.init = function () {
+      this.buildAcctDialog();
       fleegix.event.listen($('newAccountButton'),
         'onclick', this, 'showForm');
       fleegix.event.listen($('save'), 'onclick',
@@ -69,6 +95,9 @@
     nasfulia.account, 'init');
 </script>
 
+<link rel="stylesheet" href="/site_media/css/jquery-ui-themeroller.css" type="text/css" media="screen">
+
+
 <style type="text/css">
   * {
     font-family: "Lucida Grande", "Verdana", sans-serif;
@@ -103,67 +132,72 @@
 
 </head>
   <body>
-  <div>
-    <a href="/home">
-      Home
-    </a>
-  </div>
-  <div>
-    <form id="createForm" method="post">
-      <input type="button" id="newAccountButton"
-        name="newAccountButton" value="New Account"/>
-      <div id="createFormFields">
-        <div>
-          Service
-        </div>
-        <div>
-          <select id="service" name="service">
-            <option value="">
-              (Select an online service)
-            </option>
-            <option value="http://twitter.com/">
-              Twitter
-            </option>
-            <option value="http://identi.ca/">
-              Identica
-            </option>
-            <option value="http://friendfeed.com/">
-              FriendFeed
-            </option>
-          </select>
-        </div>
-        <div>
-          Username
-        </div>
-        <div>
-          <input type="text" id="username"
-            name="username" value=""/>
-        </div>
-        <div>
-          Password
-        </div>
-        <div>
-          <input type="password" id="password"
-            name="password" value=""/>
-        </div>
-        <div class="floatLeft">
-          <input type="button" id="cancel" name="cancel"
-            value="Cancel"/>
-        </div>
-        <div class="floatRight">
-          <input type="button" id="save" name="save"
-            value="Save"/>
-        </div>
+    <div>
+      <a href="/home">
+        Home
+      </a> |
+      <a href="#" onclick="jQuery('#acctDialog').dialog('open');">
+        Accounts
+      </a>
+    </div>
+    <div id="acctDialog" title="Accounts">
+      <div>
+        <form id="createForm" method="post">
+          <input type="button" id="newAccountButton"
+            name="newAccountButton" value="New Account"/>
+          <div id="createFormFields">
+            <div>
+              Service
+            </div>
+            <div>
+              <select id="service" name="service">
+                <option value="">
+                  (Select an online service)
+                </option>
+                <option value="http://twitter.com/">
+                  Twitter
+                </option>
+                <option value="http://identi.ca/">
+                  Identica
+                </option>
+                <option value="http://friendfeed.com/">
+                  FriendFeed
+                </option>
+              </select>
+            </div>
+            <div>
+              Username
+            </div>
+            <div>
+              <input type="text" id="username"
+                name="username" value=""/>
+            </div>
+            <div>
+              Password
+            </div>
+            <div>
+              <input type="password" id="password"
+                name="password" value=""/>
+            </div>
+            <div class="floatLeft">
+              <input type="button" id="cancel" name="cancel"
+                value="Cancel"/>
+            </div>
+            <div class="floatRight">
+              <input type="button" id="save" name="save"
+                value="Save"/>
+            </div>
+          </div>
+        </form>
       </div>
-    </form>
-  </div>
-  {% if not accounts|length %}
-  (You currently have no accounts set up.)
-  {% else %}
-    {% for a in account %}
+      {% if not accounts|length %}
+      (You currently have no accounts set up.)
+      {% else %}
+        {% for a in account %}
 
-    {% endfor %}
-  {% endif %}
+        {% endfor %}
+      {% endif %}
+      </div>
   </body>
 </html>
 
