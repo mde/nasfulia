@@ -12,6 +12,10 @@ class dispatcher:
         if kw.has_key('id'):
             if request.method == 'GET':
                 return member_item.show(request, *a, **kw)
+            elif request.method == 'PUT':
+                pass
+            elif request.method == 'DELETE':
+                pass
             else:
                 if request.has_key('_action'):
                     if request.POST['_action'].lower() == 'put':
@@ -22,13 +26,13 @@ class dispatcher:
         else:
             if request.method == 'GET':
                 return member_item.index(request, *a, **kw)
-            else:
+            elif request.method == 'POST':
                 return member_item.create(request, *a, **kw)
 
         raise Http404
 
 class Account:
-    def index(self, request, user_id, format):
+    def index(self, request, format, user_id):
         accounts = request.session['accounts']
         # File extension -- json/xml
         if format:
@@ -41,10 +45,10 @@ class Account:
                 'accounts': accounts,
                 'user_id': user_id })
 
-    def create(self, request, user_id):
+    def create(self, request, format, user_id):
         return HttpResponse('create ' + user_id)
 
-    def show(self, request, user_id, id):
+    def show(self, request, format, user_id, id):
         return HttpResponse('show ' + user_id + ' -- ' + id)
 
 dispatcher = dispatcher(Account)

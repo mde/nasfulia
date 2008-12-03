@@ -13,10 +13,60 @@
 <script type="text/javascript">
   var nasfulia = {};
   nasfulia.account = new function () {
+    var _this = this;
     this.init = function () {
+      fleegix.event.listen($('newAccountButton'),
+        'onclick', this, 'showForm');
+      fleegix.event.listen($('save'), 'onclick',
+        this, 'saveAccount');
+      fleegix.event.listen($('cancel'), 'onclick',
+        this, 'cancelSaveAccount');
+    };
+    this.showForm = function () {
+      $('createFormFields').style.display = 'block';
+      $('newAccountButton').style.display = 'none';
+    };
+    this.hideForm = function () {
+      $('createFormFields').style.display = 'none';
+      $('newAccountButton').style.display = 'block';
+    };
+    this.saveAccount = function () {
+      var success = function (o) {
+        console.log(o);
+        _this.hideForm();
+      }
+      var username = fleegix.cookie.get('username');
+      var data;
+      var err;
+      // Serialize the data
+      data = fleegix.form.toObject($('createForm'));
+      // Validate
+      for (var d in data) {
+        if (!data[d]) {
+          err = true;
+        }
+      }
+      // If err, alert the user
+      if (err) {
+        alert('All fields required.');
+      }
+      // Otherwise submit
+      else {
+        data = fleegix.json.serialize(data);
+        fleegix.xhr.send({
+          url: '/users/' + username + '/accounts',
+          method: 'POST',
+          data: data,
+          handleBoth: success
+        });
+      }
+    };
+    this.cancelSaveAccount = function () {
+      this.hideForm();
     };
   };
-  fleegix.event.listen(window, 'onload', nasfulia.account, 'init');
+  fleegix.event.listen(window, 'onload',
+    nasfulia.account, 'init');
 </script>
 
 <style type="text/css">
@@ -36,6 +86,19 @@
   a img {
     border: 0;
   }
+  #createFormFields {
+    width: 24em;
+    padding: 1em;
+    border: 1px solid #ccc;
+    display: none;
+    overflow: hidden;
+  }
+  .floatLeft {
+    float: left;
+  }
+  .floatRight {
+    float: right;
+  }
 </style>
 
 </head>
@@ -46,15 +109,59 @@
     </a>
   </div>
   <div>
-    <form method="post">
-      <input type="button" value="New Account"/>
+    <form id="createForm" method="post">
+      <input type="button" id="newAccountButton"
+        name="newAccountButton" value="New Account"/>
+      <div id="createFormFields">
+        <div>
+          Service
+        </div>
+        <div>
+          <select id="service" name="service">
+            <option value="">
+              (Select an online service)
+            </option>
+            <option value="http://twitter.com/">
+              Twitter
+            </option>
+            <option value="http://identi.ca/">
+              Identica
+            </option>
+            <option value="http://friendfeed.com/">
+              FriendFeed
+            </option>
+          </select>
+        </div>
+        <div>
+          Username
+        </div>
+        <div>
+          <input type="text" id="username"
+            name="username" value=""/>
+        </div>
+        <div>
+          Password
+        </div>
+        <div>
+          <input type="password" id="password"
+            name="password" value=""/>
+        </div>
+        <div class="floatLeft">
+          <input type="button" id="cancel" name="cancel"
+            value="Cancel"/>
+        </div>
+        <div class="floatRight">
+          <input type="button" id="save" name="save"
+            value="Save"/>
+        </div>
+      </div>
     </form>
   </div>
   {% if not accounts|length %}
   (You currently have no accounts set up.)
   {% else %}
     {% for a in account %}
-   
+
     {% endfor %}
   {% endif %}
   </body>
