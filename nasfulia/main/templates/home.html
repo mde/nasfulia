@@ -1,1 +1,123 @@
+<!DOCTYPE html
+   PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title></title>
+
+<script type="text/javascript"
+  src="/site_media/js/lib/jquery/jquery-1.2.6.js"></script>
+<script type="text/javascript" charset="utf-8">
+  jQuery.noConflict();
+</script>
+<script type="text/javascript"
+  src="/site_media/js/lib/jquery/jquery-ui/jquery-ui-1.6rc2.js"></script>
+<script type="text/javascript"
+  src="/site_media/js/lib/fleegix_js/fleegix.js"></script>
+
+<script type="text/javascript"
+  src="/site_media/js/nasfulia/app.js"></script>
+<script type="text/javascript"
+  src="/site_media/js/nasfulia/user.js"></script>
+<script type="text/javascript"
+  src="/site_media/js/nasfulia/account.js"></script>
+
+<script type="text/javascript">
+  nasfulia.home = new function () {
+    var _this = this;
+    this.init = function (p) {
+      var params = p || {};
+      nasfulia.user.setUpAccounts(p.accounts);
+      if (nasfulia.user.accounts.count == 0) {
+        nasfulia.account.init();
+        jQuery('#acctDialog').dialog('open');
+      }
+    };
+  };
+  nasfulia.app.initParams.accounts = {{ accounts }};
+  nasfulia.app.pageInit = nasfulia.home.init;
+  fleegix.event.listen(window, 'onload',
+    nasfulia.app, 'init');
+</script>
+
+<link rel="stylesheet" href="/site_media/css/global.css"
+  type="text/css" media="screen">
+<link rel="stylesheet" href="/site_media/css/jquery-ui-themeroller.css"
+  type="text/css" media="screen">
+
+<style type="text/css">
+  #createFormFields {
+    width: 24em;
+    padding: 1em;
+    border: 1px solid #ccc;
+    display: none;
+    overflow: hidden;
+  }
+</style>
+
+</head>
+  <body>
 Zees eez zee home page!
+    <div id="acctDialog" title="Accounts">
+      <div>
+        <form id="createForm" method="post">
+          <input type="button" id="newAccountButton"
+            name="newAccountButton" value="New Account"/>
+          <div id="createFormFields">
+            <div>
+              Service
+            </div>
+            <div>
+              <select id="service" name="service">
+                <option value="">
+                  (Select an online service)
+                </option>
+                <option value="http://twitter.com/">
+                  Twitter
+                </option>
+                <option value="http://identi.ca/">
+                  Identica
+                </option>
+                <option value="http://friendfeed.com/">
+                  FriendFeed
+                </option>
+              </select>
+            </div>
+            <div>
+              Username
+            </div>
+            <div>
+              <input type="text" id="username"
+                name="username" value=""/>
+            </div>
+            <div>
+              Password
+            </div>
+            <div>
+              <input type="password" id="password"
+                name="password" value=""/>
+            </div>
+            <div class="floatLeft">
+              <input type="button" id="cancel" name="cancel"
+                value="Cancel"/>
+            </div>
+            <div class="floatRight">
+              <input type="button" id="save" name="save"
+                value="Save"/>
+            </div>
+          </div>
+        </form>
+      </div>
+      {% if not accounts|length %}
+      (You currently have no accounts set up.)
+      {% else %}
+        {% for a in account %}
+
+        {% endfor %}
+      {% endif %}
+      </div>
+    </div>
+  </body>
+</html>
