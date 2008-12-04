@@ -1,13 +1,40 @@
+<!DOCTYPE html
+   PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title></title>
+
 <script type="text/javascript"
   src="/site_media/js/lib/fleegix_js/fleegix.js"></script>
 
 <script type="text/javascript">
-  function submitForm() {
-    var form = $('loginForm');
-    fleegix.cookie.set('username', form.id_username.value);
-    form.submit();
-  }
+  var nasfulia = {};
+  nasfulia.login = new function () {
+    var _this = this;
+    this.init = function () {
+      $('id_username').focus();
+      fleegix.event.listen($('loginForm'), 'onsubmit',
+        this, 'submitForm');
+    };
+    this.submitForm = function () {
+      var form = $('loginForm');
+      fleegix.cookie.set('username', form.id_username.value);
+      form.submit();
+    };
+  };
+  fleegix.event.listen(window, 'onload',
+    nasfulia.login, 'init');
 </script>
+
+<link rel="stylesheet" href="/site_media/css/global.css"
+  type="text/css" media="screen" charset="utf-8" />
+
+</head>
+
+<body>
 
 {% if form.errors %}
 <p>Your username and password didn't match. Please try again.</p>
@@ -20,7 +47,11 @@
 <tr><td>{{ form.password.label_tag }}</td><td>{{ form.password }}</td></tr>
 </table>
 
-<input type="button" onclick="submitForm();" value="Log In" />
+<input id="loginButton" name="loginButton"
+  type="submit" value="Log In" />
 <input type="hidden" name="next" value="{{ next }}" />
 </form>
+
+  </body>
+</html>
 
