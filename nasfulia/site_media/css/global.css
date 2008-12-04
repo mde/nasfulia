@@ -1,0 +1,23 @@
+* {
+  font-family: "Lucida Grande", "Verdana", sans-serif;
+}
+a {
+  color: #864612;
+  cursor: pointer;
+  border-style: dotted;
+  border-width: 0 0 1px 0;
+  text-decoration: none;
+}
+a:hover {
+  border-style: solid;
+}
+a img {
+  border: 0;
+}
+.floatLeft {
+  float: left;
+}
+.floatRight {
+  float: right;
+}
+
