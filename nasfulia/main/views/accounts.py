@@ -2,34 +2,12 @@ from django.http import HttpResponse
 from django.http import Http404
 from django.shortcuts import render_to_response
 from django.core import serializers
-
-class Dispatcher:
-    def __init__(self, member_class):
-        self.member_class = member_class
-
-    def dispatch(self, request, *a, **kw):
-        member_item = self.member_class()
-        if kw.has_key('id'):
-            if request.method == 'GET':
-                return member_item.show(request, *a, **kw)
-            elif request.method == 'PUT':
-                pass
-            elif request.method == 'DELETE':
-                pass
-            else:
-                if request.has_key('_action'):
-                    if request.POST['_action'].lower() == 'put':
-                        return member_item.PUT(request, *a, **kw)
-                    elif request.POST['_action'].lower() == 'delete':
-                        return member_item.DELETE(request, *a, **kw)
-
-        else:
-            if request.method == 'GET':
-                return member_item.index(request, *a, **kw)
-            elif request.method == 'POST':
-                return member_item.create(request, *a, **kw)
-
-        raise Http404
+from django.forms import ModelForm
+from restful_dispatcher import Dispatcher
+from django.db import models
+from nasfulia.main import models as nasfulia_models
+from django.contrib.auth.models import User
+from datetime import datetime
 
 class Account:
     def index(self, request, format, user_id):
@@ -46,13 +24,35 @@ class Account:
                 'user_id': user_id })
 
     def create(self, request, format, user_id):
-        return HttpResponse('create ' + user_id)
+        d = request.POST.copy() # Figures, POST data is immutable
+        d['created_at'] = datetime.now()
+        account = nasfulia_models.Account()
+        id = request.session.get('_auth_user_id')
+        user = User.objects.get(id=id)
+        account.user = user
+        form = AccountForm(data=d, instance=account)
+        if form.is_valid():
+            form.save()
+            return HttpResponse('created account for ' + user_id)
+        else:
+            print form.errors
+            return HttpResponse('error creating ' + user_id)
 
     def show(self, request, format, user_id, id):
         return HttpResponse('show ' + user_id + ' -- ' + id)
+
+    def update(self, request, format, user_id, id):
+        return HttpResponse('upate ' + user_id + ' -- ' + id)
+
+    def delete(self, request, format, user_id, id):
+        return HttpResponse('delete ' + user_id + ' -- ' + id)
 
 dispatcher = Dispatcher(Account)
 def dispatch(request, *a, **kw):
     return dispatcher.dispatch(request, *a, **kw)
 
+class AccountForm(ModelForm):
+    class Meta:
+        model = nasfulia_models.Account
+        exclude = ('user', 'updated_at')
 

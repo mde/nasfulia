@@ -15,7 +15,7 @@
 <script type="text/javascript"
   src="/site_media/js/lib/jquery/jquery-ui/jquery-ui-1.6rc2.js"></script>
 <script type="text/javascript"
-  src="/site_media/js/lib/fleegix_js/fleegix.js"></script>
+  src="/site_media/js/lib/fleegix_js/fleegix.js.uncompressed.js"></script>
 
 <script type="text/javascript"
   src="/site_media/js/nasfulia/app.js"></script>
@@ -32,11 +32,11 @@
       nasfulia.user.setUpAccounts(p.accounts);
       if (nasfulia.user.accounts.count == 0) {
         nasfulia.account.init();
-        jQuery('#acctDialog').dialog('open');
+        jQuery('#accountDialog').dialog('open');
       }
     };
   };
-  nasfulia.app.initParams.accounts = {{ accounts }};
+  nasfulia.app.initParams.accounts = {{ accounts|safe }};
   nasfulia.app.pageInit = nasfulia.home.init;
   fleegix.event.listen(window, 'onload',
     nasfulia.app, 'init');
@@ -49,75 +49,99 @@
 
 <style type="text/css">
   #createFormFields {
-    width: 24em;
-    padding: 1em;
-    border: 1px solid #ccc;
+    padding-bottom: 1em;
+    border-bottom: 1px solid #ccc;
     display: none;
     overflow: hidden;
+  }
+  #accountDialog {
+    padding: 0;
+    margin: 0;
+  }
+  #accountDialog .padding {
+    padding: 1em;
+  }
+  /* Clear floats inside this container */
+  #accountDialog .headerForm {
+    overflow: hidden
+  }
+  #accountDialog .noResults {
+    margin-top: 1em;
+    color: #999;
+    text-align: center;
   }
 </style>
 
 </head>
   <body>
 Zees eez zee home page!
-    <div id="acctDialog" title="Accounts">
-      <div>
-        <form id="createForm" method="post">
-          <input type="button" id="newAccountButton"
-            name="newAccountButton" value="New Account"/>
-          <div id="createFormFields">
-            <div>
-              Service
-            </div>
-            <div>
-              <select id="service" name="service">
-                <option value="">
-                  (Select an online service)
-                </option>
-                <option value="http://twitter.com/">
-                  Twitter
-                </option>
-                <option value="http://identi.ca/">
-                  Identica
-                </option>
-                <option value="http://friendfeed.com/">
-                  FriendFeed
-                </option>
-              </select>
-            </div>
-            <div>
-              Username
-            </div>
-            <div>
-              <input type="text" id="username"
-                name="username" value=""/>
-            </div>
-            <div>
-              Password
-            </div>
-            <div>
-              <input type="password" id="password"
-                name="password" value=""/>
-            </div>
-            <div class="floatLeft">
-              <input type="button" id="cancel" name="cancel"
-                value="Cancel"/>
-            </div>
+    <!--  Accounts dialog start -->
+    <div id="accountDialog" title="Accounts">
+      <div class="padding">
+        <div class="headerForm">
+          <form id="createForm" method="post">
             <div class="floatRight">
-              <input type="button" id="save" name="save"
-                value="Save"/>
+              <input type="button" id="newAccountButton"
+                name="newAccountButton" value="New Account"/>
             </div>
-          </div>
-        </form>
-      </div>
-      {% if not accounts|length %}
-      (You currently have no accounts set up.)
-      {% else %}
-        {% for a in account %}
+            <div id="createFormFields">
+              <div>
+                Service
+              </div>
+              <div>
+                <select id="service_id" name="service_id">
+                  <option value="">
+                    (Select an online service)
+                  </option>
+                  <option value="http://twitter.com/">
+                    Twitter
+                  </option>
+                  <option value="http://identi.ca/">
+                    Identica
+                  </option>
+                  <option value="http://friendfeed.com/">
+                    FriendFeed
+                  </option>
+                </select>
+              </div>
+              <div>
+                Username
+              </div>
+              <div>
+                <input type="text" id="username"
+                  name="username" value=""/>
+              </div>
+              <div>
+                Password
+              </div>
+              <div>
+                <input type="password" id="password"
+                  name="password" value=""/>
+              </div>
+              <div class="floatLeft">
+                <input type="button" id="cancel" name="cancel"
+                  value="Cancel"/>
+              </div>
+              <div class="floatRight">
+                <input type="button" id="save" name="save"
+                  value="Save"/>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="results">
+        {% if not accounts|length %}
+        <div class="noResults">
+          (You currently have no accounts set up.)
+        </div>
+        {% else %}
+          {% for a in account %}
 
-        {% endfor %}
-      {% endif %}
+          {% endfor %}
+        {% endif %}
+        </div>
       </div>
     </div>
+    <!--  Accounts dialog end -->
   </body>
 </html>

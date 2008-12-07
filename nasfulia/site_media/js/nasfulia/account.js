@@ -3,14 +3,10 @@ nasfulia.account = new function () {
   var _this = this;
   
   this.buildAcctDialog = function (){
-     jQuery("#acctDialog").dialog({
-        height: 450,
-        width: 600,
-        modal:true,
-        overlay: { 
-          opacity: 0.5, 
-          background: "black" 
-        },
+     jQuery("#accountDialog").dialog({
+        height: '24em',
+        width: '36em',
+        modal: false,
         buttons: { 
          "Ok": function() { 
            jQuery(this).dialog("close"); 
@@ -58,12 +54,13 @@ nasfulia.account = new function () {
     }
     // Otherwise submit
     else {
-      data = fleegix.json.serialize(data);
+      data = fleegix.form.serialize($('createForm'));
+      console.log(data);
       fleegix.xhr.send({
         url: '/users/' + username + '/accounts',
         method: 'POST',
         data: data,
-        handleBoth: success
+        handleSuccess: success
       });
     }
   };

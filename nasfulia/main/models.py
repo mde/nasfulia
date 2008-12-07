@@ -11,11 +11,11 @@ class Account(models.Model):
     user = models.ForeignKey(User)
     service_id = models.CharField(max_length=255)
     username = models.CharField(max_length=255)
-    crypted_password = models.CharField(max_length=255)
+    password = models.CharField(max_length=255)
     enabled = models.BooleanField(default=True)
     post_only = models.BooleanField(default=True)
     created_at = models.DateTimeField()
-    updated_at = models.DateTimeField()
+    updated_at = models.DateTimeField(null=True)
 
 class Track(models.Model):
     user = models.ForeignKey(User)
