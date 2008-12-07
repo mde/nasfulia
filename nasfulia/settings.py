@@ -85,5 +85,4 @@ INSTALLED_APPS = (
 AUTH_PROFILE_MODULE = "nasfulia.main.profile"
 LOGIN_REDIRECT_URL = '/profile'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
-
+CACHE_BACKEND = 'locmem:///'
