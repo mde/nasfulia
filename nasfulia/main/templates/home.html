@@ -30,9 +30,9 @@
     this.init = function (p) {
       var params = p || {};
       nasfulia.user.setUpAccounts(p.accounts);
+      nasfulia.account.init();
       if (nasfulia.user.accounts.count == 0) {
-        nasfulia.account.init();
-        jQuery('#accountDialog').dialog('open');
+        nasfulia.account.showDialog();
       }
     };
   };
@@ -48,6 +48,9 @@
   type="text/css" media="screen">
 
 <style type="text/css">
+  #accountDialog {
+    display: none;
+  }
   #createFormFields {
     padding-bottom: 1em;
     border-bottom: 1px solid #ccc;
@@ -130,15 +133,9 @@ Zees eez zee home page!
           </form>
         </div>
         <div class="results">
-        {% if not accounts|length %}
-        <div class="noResults">
-          (You currently have no accounts set up.)
-        </div>
-        {% else %}
-          {% for a in account %}
-
-          {% endfor %}
-        {% endif %}
+          <div class="noResults">
+            (You currently have no accounts set up.)
+          </div>
         </div>
       </div>
     </div>

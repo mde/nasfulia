@@ -1,7 +1,7 @@
   
 nasfulia.account = new function () {
   var _this = this;
-  
+  var _initialized = false; 
   this.buildAcctDialog = function (){
      jQuery("#accountDialog").dialog({
         height: '24em',
@@ -24,6 +24,22 @@ nasfulia.account = new function () {
     fleegix.event.listen($('cancel'), 'onclick',
       this, 'cancelSaveAccount');
   };
+  this.showDialog = function () {
+    this.renderAccounts();
+    jQuery('#accountDialog').dialog('open');
+  };
+  this.renderAccounts = function () {
+    var accts = nasfulia.user.accounts;
+    console.log(accts);
+    var a;
+    var html = '';
+    accts.each(function (v, k) {
+      console.log(v);
+      html += '<div>' + v.username + ' on ' + v.service_id + '</div>';
+    });
+    var node = jQuery('#accountDialog').find('div.results').get(0);
+    node.innerHTML = html;
+  }
   this.showForm = function () {
     $('createFormFields').style.display = 'block';
     $('newAccountButton').style.display = 'none';

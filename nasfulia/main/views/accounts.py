@@ -76,7 +76,7 @@ class Account:
                 # Save the new account
                 account = form.save()
                 # Refresh cached account data
-                accounts = Account.objects.filter(user__id=id)
+                accounts = nasfulia_models.Account.objects.filter(user__id=id)
                 request.session['accounts'] = accounts
                 return HttpResponse('created account for ' + user_id)
             else:
