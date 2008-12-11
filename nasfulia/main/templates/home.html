@@ -48,9 +48,6 @@
   type="text/css" media="screen">
 
 <style type="text/css">
-  #accountDialog {
-    display: none;
-  }
   #createFormFields {
     padding-bottom: 1em;
     border-bottom: 1px solid #ccc;
@@ -58,6 +55,7 @@
     overflow: hidden;
   }
   #accountDialog {
+    display: none;
     padding: 0;
     margin: 0;
   }
@@ -77,7 +75,13 @@
 
 </head>
   <body>
-Zees eez zee home page!
+    <div id="header">
+      <div id="mainNav">
+        <a id="accountsDialogLink">
+          Accounts
+        </a>
+      </div>
+    </div>
     <!--  Accounts dialog start -->
     <div id="accountDialog" title="Accounts">
       <div class="padding">

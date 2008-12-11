@@ -5,9 +5,12 @@ nasfulia.user = new function () {
   this.setUpAccounts = function (arr) {
     var a;
     for (var i = 0; i < arr.length; i++) {
-      a = arr[i].fields;
-      this.accounts.addItem(a.username + '@' + a.service_id, a);
+      this.addAccount(arr[i]);
     }
+  };
+  this.addAccount = function (a) {
+    this.accounts.addItem(a.username + '@' +
+      a.service_id, a);
   };
 };
 

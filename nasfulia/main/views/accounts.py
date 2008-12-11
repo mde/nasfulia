@@ -74,11 +74,23 @@ class Account:
                 form.cleaned_data['password'] = self.__encrypt_password(
                     user.username, form.cleaned_data['password'])
                 # Save the new account
-                account = form.save()
+                acct = form.save()
                 # Refresh cached account data
                 accounts = nasfulia_models.Account.objects.filter(user__id=id)
                 request.session['accounts'] = accounts
-                return HttpResponse('created account for ' + user_id)
+                # Return the saved account
+                print account.username
+                ret = {
+                    "service_id": acct.service_id,
+                    "username": acct.username,
+                    "enabled": acct.enabled,
+                    "post_only": acct.post_only
+                }
+                if format == 'xml':
+                    ret = pyxslt.serialize.toString(prettyPrintXml=True, accounts=ret)
+                elif format == 'json':
+                    ret = simplejson.dumps(ret)
+                return HttpResponse(ret, mimetype='application/' + format)
             else:
                 print form.errors
                 return HttpResponse('error creating ' + user_id)

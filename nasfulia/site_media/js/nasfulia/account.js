@@ -1,22 +1,45 @@
   
 nasfulia.account = new function () {
   var _this = this;
-  var _initialized = false; 
-  this.buildAcctDialog = function (){
-     jQuery("#accountDialog").dialog({
-        height: '24em',
-        width: '36em',
-        modal: false,
-        buttons: { 
-         "Ok": function() { 
-           jQuery(this).dialog("close"); 
-         }
-        }
-      });
+  var _dialogExists = false;
+  this.buildAcctDialog = function () {
+   jQuery("#accountDialog").dialog({
+      height: '24em',
+      width: '36em',
+      modal: false,
+      buttons: { 
+       "Ok": function() { 
+         jQuery(this).dialog("close"); 
+       }
+      }
+    });
+    if (this.renderAccounts()) {
+      $('accountDialog').style.display = 'block';
+      _dialogExists = true;
+    }
   };
-  
+  this.renderAccounts = function () {
+    var accts = nasfulia.user.accounts;
+    var a;
+    var html = '<ul>';
+    // Sort by username
+    accts.sort(function (a, b) {
+      return a.username > b.username ? 1 : -1;
+    });
+    accts.each(function (v, k) {
+      html += _this.accountItem(v);
+    });
+    html += '</ul>';
+    var node = jQuery('#accountDialog').find('div.results').get(0);
+    node.innerHTML = html;
+    return true;
+  };
+  this.accountItem = function (acct) {
+      return '<ul>' + acct.username + ' on ' + acct.service_id + '</ul>';
+  };
   this.init = function () {
-    this.buildAcctDialog();
+    fleegix.event.listen($('accountsDialogLink'),
+      'onclick', this, 'showDialog');
     fleegix.event.listen($('newAccountButton'),
       'onclick', this, 'showForm');
     fleegix.event.listen($('save'), 'onclick',
@@ -25,21 +48,11 @@ nasfulia.account = new function () {
       this, 'cancelSaveAccount');
   };
   this.showDialog = function () {
-    this.renderAccounts();
+    if (!_dialogExists) {
+      this.buildAcctDialog();
+    }
     jQuery('#accountDialog').dialog('open');
   };
-  this.renderAccounts = function () {
-    var accts = nasfulia.user.accounts;
-    console.log(accts);
-    var a;
-    var html = '';
-    accts.each(function (v, k) {
-      console.log(v);
-      html += '<div>' + v.username + ' on ' + v.service_id + '</div>';
-    });
-    var node = jQuery('#accountDialog').find('div.results').get(0);
-    node.innerHTML = html;
-  }
   this.showForm = function () {
     $('createFormFields').style.display = 'block';
     $('newAccountButton').style.display = 'none';
@@ -50,7 +63,9 @@ nasfulia.account = new function () {
   };
   this.saveAccount = function () {
     var success = function (o) {
-      console.log(o);
+      var res = eval('('+ o +')');
+      nasfulia.user.addAccount(res);
+      _this.renderAccounts();
       _this.hideForm();
     }
     var username = fleegix.cookie.get('username');
@@ -71,9 +86,8 @@ nasfulia.account = new function () {
     // Otherwise submit
     else {
       data = fleegix.form.serialize($('createForm'));
-      console.log(data);
       fleegix.xhr.send({
-        url: '/users/' + username + '/accounts',
+        url: '/users/' + username + '/accounts.json',
         method: 'POST',
         data: data,
         handleSuccess: success
