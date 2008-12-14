@@ -9,8 +9,7 @@ nasfulia.user = new function () {
     }
   };
   this.addAccount = function (a) {
-    this.accounts.addItem(a.username + '@' +
-      a.service_id, a);
+    this.accounts.addItem(a.id.toString(), a);
   };
 };
 

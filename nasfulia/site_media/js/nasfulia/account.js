@@ -35,17 +35,22 @@ nasfulia.account = new function () {
     return true;
   };
   this.accountItem = function (acct) {
-      return '<ul>' + acct.username + ' on ' + acct.service_id + '</ul>';
+      return '<li id="accountItem_' + acct.id + '">' + 
+        acct.username + ' on ' + acct.service_id + '</li>';
   };
   this.init = function () {
     fleegix.event.listen($('accountsDialogLink'),
       'onclick', this, 'showDialog');
+    fleegix.event.listen($('accountsDialog'),
+      'onclick', this, 'handleClick');
+    /*
     fleegix.event.listen($('newAccountButton'),
       'onclick', this, 'showForm');
     fleegix.event.listen($('save'), 'onclick',
       this, 'saveAccount');
     fleegix.event.listen($('cancel'), 'onclick',
       this, 'cancelSaveAccount');
+    */
   };
   this.showDialog = function () {
     if (!_dialogExists) {
@@ -96,6 +101,9 @@ nasfulia.account = new function () {
   };
   this.cancelSaveAccount = function () {
     this.hideForm();
+  };
+  this.handleClick = function (e) {
+
   };
 };
 

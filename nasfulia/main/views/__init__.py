@@ -12,6 +12,7 @@ def home(request):
     ret = []
     def map_acct(acct):
         ret.append({
+            "id": acct.id,
             "service_id": acct.service_id,
             "username": acct.username,
             "enabled": acct.enabled,

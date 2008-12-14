@@ -38,6 +38,7 @@ class Account:
                 ret = []
                 def map_acct(acct):
                     ret.append({
+                        "id": acct.id,
                         "service_id": acct.service_id,
                         "username": acct.username,
                         "enabled": acct.enabled,
@@ -81,6 +82,7 @@ class Account:
                 # Return the saved account
                 print account.username
                 ret = {
+                    "id": acct.id,
                     "service_id": acct.service_id,
                     "username": acct.username,
                     "enabled": acct.enabled,
