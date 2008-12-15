@@ -29,6 +29,8 @@ class Account:
         return input.rstrip("\n")
 
     def index(self, request, format, user_id):
+        print "++++++++++"
+        print "index"
         # Can't use the login_required decorator
         # because it hijacks the 'next' redirect after login
         if request.user.is_authenticated():
@@ -112,6 +114,7 @@ class Account:
 # RESTful dispatch wrapper
 dispatcher = Dispatcher(Account)
 def dispatch(request, *a, **kw):
+    print kw
     return dispatcher.dispatch(request, *a, **kw)
 
 class AccountForm(ModelForm):

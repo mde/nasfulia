@@ -1,5 +1,6 @@
 
 nasfulia.user = new function () {
+  this.username = fleegix.cookie.get('username');
   // List of accounts, referenceable by id
   this.accounts = new fleegix.hash.Hash();
   this.setUpAccounts = function (arr) {

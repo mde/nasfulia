@@ -2,6 +2,24 @@
 nasfulia.account = new function () {
   var _this = this;
   var _dialogExists = false;
+  var _clickActions;
+ 
+  var _initActions = function () {
+    _clickActions ={
+      'new': _this.showForm,
+      'cancel': _this.hideForm,
+      'save': _this.saveAccount,
+      'delete': _this.deleteAccount
+    };
+  };
+
+  this.init = function () {
+    _initActions();
+    fleegix.event.listen($('accountDialogLink'),
+      'onclick', this, 'showDialog');
+    var accountDialog = new fleegix.event.Delegator(
+      $('accountDialog'), _clickActions, { context: _this });
+  };
   this.buildAcctDialog = function () {
    jQuery("#accountDialog").dialog({
       height: '24em',
@@ -35,22 +53,13 @@ nasfulia.account = new function () {
     return true;
   };
   this.accountItem = function (acct) {
-      return '<li id="accountItem_' + acct.id + '">' + 
-        acct.username + ' on ' + acct.service_id + '</li>';
-  };
-  this.init = function () {
-    fleegix.event.listen($('accountDialogLink'),
-      'onclick', this, 'showDialog');
-    fleegix.event.listen($('accountDialog'),
-      'onclick', this, 'handleClick');
-    /*
-    fleegix.event.listen($('newAccountButton'),
-      'onclick', this, 'showForm');
-    fleegix.event.listen($('save'), 'onclick',
-      this, 'saveAccount');
-    fleegix.event.listen($('cancel'), 'onclick',
-      this, 'cancelSaveAccount');
-    */
+      var html = '';
+      html += '<li id="accountItem_' + acct.id + '">';
+      html += acct.username + ' on ' + acct.service_id;
+      html += '&nbsp;'
+      html += '<input type="button" class="delete" value="Delete"/>';
+      html += '</li>';
+      return html;
   };
   this.showDialog = function () {
     if (!_dialogExists) {
@@ -60,11 +69,11 @@ nasfulia.account = new function () {
   };
   this.showForm = function () {
     $('accountFields').style.display = 'block';
-    $('newAccountButton').style.display = 'none';
+    $('account_new').style.display = 'none';
   };
   this.hideForm = function () {
     $('accountFields').style.display = 'none';
-    $('newAccountButton').style.display = 'block';
+    $('account_new').style.display = 'block';
   };
   this.saveAccount = function () {
     var success = function (o) {
@@ -73,7 +82,7 @@ nasfulia.account = new function () {
       _this.renderAccounts();
       _this.hideForm();
     }
-    var username = fleegix.cookie.get('username');
+    var username = nasfulia.user.username; 
     var data;
     var err;
     // Serialize the data
@@ -102,8 +111,20 @@ nasfulia.account = new function () {
   this.cancelSaveAccount = function () {
     this.hideForm();
   };
-  this.handleClick = function (e) {
-
-  };
+  this.deleteAccount = function (e) {
+    var elem = fleegix.event.getSrcElementByAttribute(e, 'id');
+    var id = elem.id.replace(/^accountItem_/, '');
+    var success = function (o) {
+      console.log(o); 
+    };
+    var username = nasfulia.user.username; 
+    fleegix.xhr.send({
+      url: '/users/' + username + '/accounts/' + id + '.json',
+      method: 'DELETE',
+      data: '',
+      handleSuccess: success
+    });
+  }
 };
+
 

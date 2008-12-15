@@ -84,12 +84,12 @@
     </div>
     <!--  Accounts dialog start -->
     <div id="accountDialog" title="Accounts">
-      <div class="padding">
-        <div class="headerForm">
-          <form id="account_form" method="post">
+      <form id="account_form" method="post">
+        <div class="padding">
+          <div class="headerForm">
             <div class="floatRight">
-              <input type="button" id="newAccountButton"
-                name="newAccountButton" value="New Account"/>
+              <input type="button" class="new" id="account_new"
+                name="new" value="New Account"/>
             </div>
             <div id="accountFields">
               <div>
@@ -126,21 +126,21 @@
                   name="password" value=""/>
               </div>
               <div class="floatLeft">
-                <input type="button" id="account_cancel" name="cancel"
-                  value="Cancel"/>
+                <input type="button" class="cancel" id="account_cancel"
+                  name="cancel" value="Cancel"/>
               </div>
               <div class="floatRight">
-                <input type="button" id="account_save" name="save"
-                  value="Save"/>
+                <input type="button" class="save" id="account_save"
+                  name="save" value="Save"/>
               </div>
             </div>
-          </form>
-        </div>
-        <div class="results">
-          <div class="noResults">
-            (You currently have no accounts set up.)
           </div>
-        </div>
+          <div class="results">
+            <div class="noResults">
+              (You currently have no accounts set up.)
+            </div>
+          </div>
+        </form>
       </div>
     </div>
     <!--  Accounts dialog end -->

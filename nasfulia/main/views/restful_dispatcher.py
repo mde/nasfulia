@@ -1,3 +1,4 @@
+from django.http import *
 
 class Dispatcher:
     def __init__(self, member_class):

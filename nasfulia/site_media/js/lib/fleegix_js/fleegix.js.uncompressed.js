@@ -480,6 +480,184 @@ fleegix.dom = new function() {
 };
 
 
+
+fleegix.url = new function () {
+  // Private vars
+  var _this = this;
+  var _QS = '\\?|;';
+  var _QS_SIMPLE = new RegExp(_QS);
+  var _QS_CAPTURE = new RegExp('(' + _QS + ')');
+
+  // Private function, used by both getQSParam and setQSParam
+  var _changeQS = function (mode, str, name, val) {
+    var match = _QS_CAPTURE.exec(str);
+    var delim;
+    var base;
+    var query;
+    var obj;
+    var s = '';
+    // If there's a querystring delimiter, save it
+    // for reinsertion into the return value
+    if (match && match.length > 0) {
+      delim = match[0];
+    }
+    // Delimiter -- entire URL, need to decompose
+    if (delim) {
+      base = _this.getBase(str);
+      query = _this.getQS(str);
+    }
+    // Just a querystring passed
+    else {
+      query = str;
+    }
+    obj = _this.qsToObject(query, { arrayizeMulti: true });
+    if (mode == 'set') { obj[name] = val; }
+    else { delete obj[name]; }
+    if (base) {
+      s = base + delim;
+    }
+    s += _this.objectToQS(obj);
+    return s;
+  };
+  /**
+   * Convert the values in a query string (key=val&key=val) to
+   * an Object
+   * @param str -- A querystring
+   * @param o -- JS object of options, current only includes:
+   *   arrayizeMulti: (Boolean) convert mutliple instances of
+   *      the same key into an array of values instead of
+   *      overriding. Defaults to false.
+   * @returns JavaScript key/val object with the values from
+   * the querystring
+   */
+  this.qsToObject = function (str, o) {
+    var opts = o || {};
+    var d = {};
+    var arrayizeMulti = opts.arrayizeMulti || false;
+    if (str) {
+      var arr = str.split('&');
+      for (var i = 0; i < arr.length; i++) {
+        var pair = arr[i].split('=');
+        var name = pair[0];
+        var val = pair[1];
+        // "We've already got one!" -- arrayize if the flag
+        // is set
+        if (typeof d[name] != 'undefined' && arrayizeMulti) {
+          if (typeof d[name] == 'string') {
+            d[name] = [d[name]];
+          }
+          d[name].push(val);
+        }
+        // Otherwise just set the value
+        else {
+          d[name] = val;
+        }
+      }
+    }
+    return d;
+  };
+  /**
+   * Convert a JS Object to querystring (key=val&key=val).
+   * Value in arrays will be added as multiple parameters
+   * @param obj -- an Object containing only scalars and arrays
+   * @returns A querystring containing the values in the
+   * Object
+   */
+  this.objectToQS = function (obj) {
+    var str = '';
+    var val;
+    for (var p in obj) {
+      val = obj[p];
+      if (typeof val == 'string') {
+        str += p + '=' + val + '&';
+      }
+      else if (val.length) {
+        for (var i = 0; i < val.length; i++) {
+          str += p + '=' + val[i] + '&';
+        }
+      }
+    }
+    if (str) {
+      str = str.substr(0, str.length - 1);
+    }
+    return str;
+  };
+  this.objectToQs = this.objectToQS; // Case-insensitive alias
+  /**
+   * Retrieve the value of a parameter from a querystring
+   * @param str -- Either a querystring or an entire URL
+   * @param name -- The param to retrieve the value for
+   * @param o -- JS object of options, current only includes:
+   *   arrayizeMulti: (Boolean) convert mutliple instances of
+   *      the same key into an array of values instead of
+   *      overriding. Defaults to false.
+   * @returns The string value of the specified param from
+   * the querystring
+   */
+  this.getQSParam = function (str, name, o) {
+    var p = null;
+    var q = _QS_SIMPLE.test(str) ? _this.getQS(str) : str;
+    var opts = o || {};
+    if (q) {
+      var h = _this.qsToObject(q, opts);
+      p = h[name];
+    }
+    return p;
+  };
+  this.getQsParam = this.getQSParam; // Case-insensitive alias
+  /**
+   * Set the value of a parameter in a querystring
+   * @param str -- Either a querystring or an entire URL
+   * @param name -- The param to set
+   * @param val -- The value to set the param to
+   * @returns  the URL or querystring, with the new value
+   * set -- if the param was not originally there, it adds it.
+   */
+  this.setQSParam = function (str, name, val) {
+    return _changeQS('set', str, name, val);
+  };
+  this.setQsParam = this.setQSParam; // Case-insensitive alias
+  /**
+   * Remove a parameter in a querystring
+   * @param str -- Either a querystring or an entire URL
+   * @param name -- The param to remove
+   * @returns  the URL or querystring, with the parameter
+   * removed
+   */
+  this.removeQSParam = function (str, name) {
+    return _changeQS('remove', str, name, null);
+  };
+  this.removeQsParam = this.removeQSParam; // Case-insensitive alias
+  this.getQS = function (s) {
+    return s.split(_QS_SIMPLE)[1];
+  };
+  this.getQs = this.getQS; // Case-insensitive alias
+  this.getBase = function (s) {
+    return s.split(_QS_SIMPLE)[0];
+  };
+};
+// Backward-compat shim
+fleegix.uri = new function () {
+  this.getParamHash = fleegix.url.qsToObject;
+  // Params are reversed, and passed-in QS is
+  // optional -- defaults to local HREF for the
+  // page it's defined on
+  this.getParam = function (name, str) {
+    var s = str || fleegix.url.getQS(document.location.href);
+    return fleegix.url.getQSParam(s, name);
+  };
+  // Params are reversed, and passed-in QS is
+  // optional -- defaults to local HREF for the
+  // page it's defined on
+  this.setParam = function (name, val, str) {
+    var s = str || fleegix.url.getQS(document.location.href);
+    return fleegix.url.setQSParam(s, name, val);
+  };
+  this.getQuery = fleegix.url.getQS;
+  this.getBase = fleegix.url.getBase;
+};
+
+
 fleegix.css = new function() {
     this.addClass = function (elem, s) {
       fleegix.css.removeClass(elem, s); // Don't add twice
@@ -890,117 +1068,8 @@ fleegix.event = new function () {
   };
 };
 
-fleegix.event.PeriodicExecuter = function (func, interval, waitFirst) {
-  var _this = this;
-  var _paused = false;
-  this.func = func || null;
-  this.interval = interval || null;
-  this.waitFirst = waitFirst || false;
-  this.start = function (waitFirst) {
-    this.waitFirst = waitFirst || this.waitFirst;
-    if (this.waitFirst) {
-      setTimeout(this.run, this.interval);
-    }
-    else {
-      this.run();
-    }
-  };
-  this.run = function () {
-    if (!_paused) {
-      _this.func();
-      setTimeout(_this.run, _this.interval);
-    }
-  };
-  this.pause = function () {
-    _paused = true;
-  };
-  this.resume = function () {
-    _paused = false;
-    this.run();
-  };
-};
-
-// Clean up listeners
-fleegix.event.listen(window, 'onunload', function () {
-  try {
-    fleegix.event.flush();
-  }
-  catch (e) {} // Squelch
-});
 
 
-
-fleegix.uri = new function () {
-  var self = this;
-
-  this.params = {};
-
-  this.getParamHash = function (str) {
-    var q = str || self.getQuery();
-    var d = {};
-    if (q) {
-      var arr = q.split('&');
-      for (var i = 0; i < arr.length; i++) {
-        var pair = arr[i].split('=');
-        var name = pair[0];
-        var val = pair[1];
-        if (typeof d[name] == 'undefined') {
-          d[name] = val;
-        }
-        else {
-          if (!(d[name] instanceof Array)) {
-            var t = d[name];
-            d[name] = [];
-            d[name].push(t);
-          }
-          d[name].push(val);
-        }
-      }
-    }
-    return d;
-  };
-  this.getParam = function (name, str) {
-    var p = null;
-    if (str) {
-      var h = this.getParamHash(str);
-      p = h[name];
-    }
-    else {
-      p = this.params[name];
-    }
-    return p;
-  };
-  this.setParam = function (name, val, str) {
-    var ret = null;
-    // If there's a query string, set the param
-    if (str) {
-      var pat = new RegExp('(^|&)(' + name + '=[^\&]*)(&|$)');
-      var arr = str.match(pat);
-      // If it's there, replace it
-      if (arr) {
-        ret = str.replace(arr[0], arr[1] + name + '=' + val + arr[3]);
-      }
-      // Otherwise append it
-      else {
-        ret = str + '&' + name + '=' + val;
-      }
-    }
-    // Otherwise create a query string with just that param
-    else {
-      ret = name + '=' + val;
-    }
-    return ret;
-  };
-  this.getQuery = function (s) {
-    var l = s ? s : location.href;
-    return l.split('?')[1];
-  };
-  this.getBase = function (s) {
-    var l = s ? s : location.href;
-    return l.split('?')[0];
-  };
-  this.params = this.getParamHash();
-};
 
 fleegix.xhr = new function () {
   // Public vars
@@ -2841,11 +2910,15 @@ fleegix.ui.Glyph.prototype = new function () {
   this.cleanup =  function () {
     this.domNode = null;
   };
-  this.clearNode =  function (node) {
-    while (node.hasChildNodes()) {
-      node.removeChild(node.firstChild);
+  this.clearNode =  function (node, useInnerHTML) {
+    if (useInnerHTML) {
+      node.innerHTML = '';
     }
-    node.innerHTML = '';
+    else {
+      while (node.hasChildNodes()) {
+        node.removeChild(node.firstChild);
+      }
+    }
   };
   this.clearAll =  function () {
     if (this.domNode) {
@@ -2980,6 +3053,399 @@ fleegix.ui.Glyph.prototype = new function () {
 
 
 
+/*
+ * Copyright 2008 Matthew Eernisse (mde@fleegix.org)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+fleegix.ui.ButtonPanel = fleegix.extend(fleegix.ui.Glyph,
+  function (domNode, id, p) {
+
+  var _this = this;
+  var params = p || {};
+
+  this.buttonsLeft = [];
+  this.buttonsCenter = [];
+  this.buttonsRight = [];
+  this.buttonsLeftNode = null;
+  this.buttonsCenterNode = null;
+  this.buttonsRightNode = null;
+
+  for (var n in params) { this[n] = params[n]; }
+
+  this.renderSelf = function () {
+
+    this.clearAll();
+
+    var appendButtons = function (set) {
+      var arr = _this['buttons' + set];
+      var node = _this['buttons' + set +
+          'Node'];
+      for (var i = 0; i < arr.length; i++) {
+        node.appendChild(arr[i]);
+        if (i < arr.length - 1) {
+          node.appendChild($text('\u00a0'));
+        }
+      }
+    }
+
+    var div = this.domNode;
+    var form = $elem('form');
+    var table = $elem('table');
+    var tbody = $elem('tbody');
+    var tr;
+    var td;
+    div.appendChild(form);
+    form.appendChild(table);
+    table.id = this.id + '_buttonPanelTable';
+    table.cellPadding = 0;
+    table.cellSpacing = 0;
+    table.style.width = '100%';
+    table.appendChild(tbody);
+    tr = $elem('tr');
+    tr.id = this.id + '_buttonPanelRow';
+    td = $elem('td');
+    td.style.width = '33%';
+    td.style.textAlign = 'left';
+    td.style.whiteSpace = 'nowrap';
+    td.id = this.id + '_buttonLeftCell';
+    this.buttonsLeftNode = td;
+    tr.appendChild(td);
+    td = $elem('td');
+    td.style.width = '33%';
+    td.style.textAlign = 'center';
+    td.style.whiteSpace = 'nowrap';
+    td.id = this.id + '_buttonCenterCell';
+    this.buttonsCenterNode = td;
+    tr.appendChild(td);
+    td = $elem('td');
+    td.style.width = '33%';
+    td.style.textAlign = 'right';
+    td.style.whiteSpace = 'nowrap';
+    td.id = this.id + '_buttonRightCell';
+    this.buttonsRightNode = td;
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    appendButtons('Left');
+    appendButtons('Center');
+    appendButtons('Right');
+  };
+});
+
+
+fleegix.ui.DialogBox = fleegix.extend(fleegix.ui.Glyph,
+  function (domNode, id, p) {
+
+  // Mix in dialog box properties
+  fleegix.mixin(this, fleegix.ui.DialogBoxMixin);
+
+  var _this = this;
+
+  var params = p || {};
+  this.width = 0;
+  this.height = 0;
+  this.titleNode = null;
+  this.contentNode = null;
+  this.buttonPanel = null;
+  this.buttonPanelNode = null;
+  this.buttonsLeft = [];
+  this.buttonsCenter = [];
+  this.buttonsRight = [];
+  this.content = null;
+  this.table = null;
+  this.issDraggable = false;
+  this.title = '';
+
+  for (var n in params) { this[n] = params[n]; }
+
+  this.init = function () {
+    this.domNode.className = 'dialogContainer';
+    var table = $elem('table');
+    var tbody = $elem('tbody');
+    var form = $elem('form');
+    var tr = null;
+    var td = null;
+    var d = null;
+    var img = null;
+    table.id = this.id + '_dialogTable';
+    table.className = 'dialogTable'
+    table.cellPadding = 0;
+    table.cellSpacing = 0;
+    table.appendChild(tbody);
+    tr = $elem('tr');
+    td = $elem('td');
+    td.className = 'dialogTopLeft';
+    tr.appendChild(td);
+    td = $elem('td');
+    td.id = this.id + '_dialogTitleBar';
+    this.titleBarNode = td;
+    td.className = 'dialogTop';
+    if (this.isDraggable) {
+      td.style.cursor = 'move';
+    }
+    tr.appendChild(td);
+    d = $elem('div');
+    d.className = 'dialogTitle';
+    d.id = this.id + '_dialogTitleContainer';
+    this.titleNode = d;
+    td.appendChild(d);
+    d = $elem('div');
+    d.className = 'dialogClose';
+    td.appendChild(d);
+    img = $elem('img', {src: '/images/dialog_close.png',
+      width: 21, height: 21, alt: ''});
+    img.className = 'dialogCloseIcon';
+    d.appendChild(img);
+    fleegix.event.listen(d, 'onclick', _this, 'close');
+    td = $elem('td');
+    td.className = 'dialogTopRight';
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    tr = $elem('tr');
+    td = $elem('td');
+    td.className = 'dialogLeft';
+    tr.appendChild(td);
+    td = $elem('td');
+    td.id = this.id + '_dialogContentContainer';
+    td.className = 'dialogContent';
+    this.contentNode = td;
+    td.innerHTML = '&nbsp;';
+    tr.appendChild(td);
+    td = $elem('td');
+    td.className = 'dialogRight';
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    tr = $elem('tr');
+    td = $elem('td');
+    td.className = 'dialogBottomLeft';
+    tr.appendChild(td);
+    td = $elem('td');
+    td.id = this.id + '_dialogButtonsContainer';
+    td.className = 'dialogBottom';
+    this.buttonPanelNode = td;
+    tr.appendChild(td);
+    td = $elem('td');
+    td.className = 'dialogBottomRight';
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+
+    this.table = table;
+    this.domNode.appendChild(table);
+
+    // Set up child glyphs
+    this.setUpButtonPanel();
+    // If content area is a glyph, set it up here
+    // and let it handle rendering itself
+    if (this.content.superClass == fleegix.ui.Glyph) {
+      this.setUpContentGlyph();
+    }
+  };
+  this.renderSelf = function () {
+    this.setTitle();
+    // If content is a simple string or DOM node,
+    // the dialog box glyph will handle rendering
+    if (this.content.superClass != fleegix.ui.Glyph) {
+      this.setContentStringOrNode();
+    }
+    this.setSize();
+  };
+  this.setSize = function (w, h) {
+    if (arguments.length == 1) {
+      throw 'setSize requires width and height params, or no params passed.'
+    }
+    if (typeof w != 'undefined') {
+      this.width = w;
+      this.height = h;
+    }
+    this.setWidth();
+    this.setHeight();
+  };
+  this.setWidth = function (n) {
+    if (typeof n != 'undefined') {
+      this.width = n;
+    }
+    this.table.style.width = this.width + 'px';
+    this.contentNode.style.width = (this.width - 24) + 'px';
+    this.domNode.style.width = this.width + 'px';
+  };
+  this.setHeight = function (n) {
+    if (typeof n != 'undefined') {
+      this.height = n;
+    }
+    this.table.style.height = (this.height - 2) + 'px';
+    this.contentNode.style.height = (this.height - 76 - 2) + 'px';
+    this.domNode.style.height = this.height + 'px';
+  };
+  this.open = function () {
+    if (!this.hasBeenRendered) { this.render(); }
+    this.domNode.style.visibility = 'visible';
+    this.domNode.style.zIndex = 9999999;
+  };
+  this.close = function () {
+    this.clearAll();
+    document.body.removeChild(this.domNode);
+    this.domNode = null;
+  };
+  this.setTitle = function (n) {
+    if (typeof n != 'undefined') {
+      this.title = n;
+    }
+    if (typeof this.title == 'string') {
+      this.titleNode.innerHTML = this.title;
+    }
+    else {
+        var ch = this.titleNode.firstChild;
+        if (ch) {
+          this.titleNode.removeChild(ch);
+        }
+        this.titleNode.appendChild(this.title);
+    }
+  };
+});
+
+fleegix.ui.MiniDialogBox = fleegix.extend(fleegix.ui.Glyph,
+  function (domNode, id, p) {
+
+  // Mix in generic content handlers
+  fleegix.mixin(this, fleegix.ui.DialogBoxMixin);
+
+  var _this = this;
+
+  var params = p || {};
+  this.width = 0;
+  this.height = 0;
+  this.titleNode = null;
+  this.contentNode = null;
+  this.buttonPanel = null;
+  this.buttonPanelNode = null;
+  this.buttonsLeft = [];
+  this.buttonsCenter = [];
+  this.buttonsRight = [];
+  this.content = null;
+  this.tableNode = null;
+  this.parentDialogBox = null;
+
+  for (var n in params) { this[n] = params[n]; }
+
+  this.init = function () {
+    var table = $elem('table');
+    var tbody = $elem('tbody');
+    var tr = null;
+    var td = null;
+    var d;
+    table.id = this.id + '_dialogTable';
+    table.className = 'miniDialogTable'
+    table.cellPadding = 0;
+    table.cellSpacing = 0;
+    table.appendChild(tbody);
+    this.tableNode = table;
+    // Content row
+    tr = $elem('tr');
+    td = $elem('td');
+    td.className = 'miniDialogContentContainer'
+    td.id = this.id + '_contentContainer';
+    td.style.padding = '12px 12px 0px 12px';
+    tr.appendChild(td);
+    tbody.appendChild(tr); 
+    this.contentNode = td;
+    // Button row
+    tr = $elem('tr');
+    td = $elem('td');
+    td.className = 'miniDialogButtonPanelContainer';
+    td.id = this.id + '_buttonPanelContainer';
+    tr.appendChild(td);
+    this.buttonPanelNode = td;
+    tbody.appendChild(tr); 
+    // Set up child glyphs
+    this.setUpButtonPanel();
+    // If content area is a glyph, set it up here
+    // and let it handle rendering itself
+    if (this.content.superClass == fleegix.ui.Glyph) {
+      this.setUpContentGlyph();
+    }
+    this.domNode.appendChild(table);
+  };
+  this.renderSelf = function () {
+    // If content is a simple string or DOM node,
+    // the dialog box glyph will handle rendering
+    if (this.content.superClass != fleegix.ui.Glyph) {
+      this.setContentStringOrNode();
+    }
+    this.setSize();
+    // 1px border
+    this.tableNode.style.height = (this.height - 1) + 'px';
+    this.tableNode.style.width = (this.width - 1) + 'px';
+  };
+  this.open = function () {
+    this.domNode.style.visibility = 'visible';
+    if (!this.hasBeenRendered) { this.render(); }
+    var z = this.parentDialogBox ?
+      parseInt(this.parentDialogBox.domNode.style.zIndex, 10) + 1 : 99999999;
+    this.domNode.style.zIndex = z;
+  };
+  this.close = function () {
+    this.clearAll();
+    document.body.removeChild(this.domNode);
+    this.domNode = null;
+  };
+});
+
+fleegix.ui.DialogBoxMixin = new function () {
+  this.setContentStringOrNode = function (n) {
+    this.content = typeof n == 'undefined' ? this.content : n;
+    var node = this.contentNode;
+    var content = this.content;
+    if (typeof content == 'string') {
+      node.innerHTML = content;
+    }
+    else {
+      var ch = node.firstChild;
+      if (ch) {
+        node.removeChild(ch);
+      }
+      node.appendChild(content);
+    }
+  };
+  // If content is a glyph, it'll handle rendering itself
+  this.setUpContentGlyph = function () {
+    for (var i = 0; i < this.children.length; i++) {
+      if (this.children[i].id == this.content.id) {
+        this.children.splice(i, 1);
+      }
+    }
+    var glyph = this.content;
+    this.children.push(glyph);
+    this.contentNode.appendChild(glyph.domNode);
+  };
+  this.setUpButtonPanel = function (p) {
+    var params = p || {};
+    for (var n in params) { this[n] = params[n]; }
+    params = { id: this.id + '_buttonPanel',
+      buttonsLeft: this.buttonsLeft,
+      buttonsCenter: this.buttonsCenter,
+      buttonsRight: this.buttonsRight };
+    var d = $elem('div');
+    d.id = this.id + '_buttonPanelContainer';
+    d.className = 'buttonPanelContainer';
+    var panel = new fleegix.ui.ButtonPanel(d, d.id, params);
+    this.children.push(panel);
+    this.buttonPanelNode.appendChild(panel.domNode);
+    this.buttonPanel = panel;
+  };
+};
+
+
 
 fleegix.i18n = new function () {
   var _this = this;
@@ -3103,6 +3569,462 @@ fleegix.html = new function () {
   };
 
 };
+/*
+ * Copyright 2006 Matthew Eernisse (mde@fleegix.org)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+if (typeof fleegix == 'undefined') {
+  throw new Error('This plugin cannot be used standalone.');
+}
+if (typeof fleegix.dom == 'undefined') {
+  throw new Error('This plugin depends on the fleegix.dom module.');
+}
+if (typeof fleegix.event == 'undefined') {
+  throw new Error('This plugin depends on the fleegix.event module.');
+}
+if (typeof fleegix.css == 'undefined') {
+  throw new Error('This plugin depends on the fleegix.css module.');
+}
+if (typeof fleegix.string == 'undefined') {
+  throw new Error('This plugin depends on the fleegix.string  module.');
+}
+fleegix.menu = new function () {
+  // Config -- used in width calculations
+  var HORIZ_MARGIN_WIDTH = 4;
+  var BORDER_WIDTH = 1;
+  var EXPANDO_ARROW_WIDTH = 16;
+  var MENU_OVERLAP = 2;
+
+  this.displayedMenu = null;
+
+  // Private props
+  this._currX = 0;
+  this._currY = 0;
+  this._currLevel = 0;
+  this._expandedItemForEachLevel = [];
+  this._xPosMarksForEachLevel = [];
+  this._yPosMarksForEachLevel = [];
+  this._baseNode = null;
+  this._scratchNode = null;
+
+  this.createScratchNode = function () {
+    var div = document.createElement('div');
+    div.id = 'fleegixHierarchicalMenuScratchNode';
+    div.style.position = 'absolute';
+    div.style.top = '-1000px';
+    div.style.left = '-1000px';
+    document.body.appendChild(div);
+    this._scratchNode = div;
+  };
+  this.showFixedMenu = function (e, menu, node, xPos, yPos) {
+    var items = menu.items;
+    this._baseNode = node;
+    if (!items || !items.length) {
+      throw new Error('Contextual menu "' + menu.id +'" has no menu items.');
+    }
+    this.hideHierarchicalMenu();
+    this.displayedMenu = menu;
+    if (menu.doBeforeShowing && typeof menu.doBeforeShowing == 'function') {
+      menu.doBeforeShowing();
+    }
+    this._showHierMenuLevel(0, menu, xPos, yPos);
+    menu.displayed = true;
+    document.body.onselectstart = function () { return false; };
+    if (e.stopPropagation) {
+      e.stopPropagation();
+    }
+    else {
+      e.cancelBubble = true;
+    }
+    if (e.preventDefault) {
+      e.preventDefault();
+    }
+    else {
+      e.returnValue = false;
+    }
+    return false;
+  };
+  this.showContextMenu = function (e, menu) {
+    this.showFixedMenu(e, menu, document.body, e.clientX, e.clientY);
+  };
+  this.hideHierarchicalMenu = function (e) {
+    this._hideSubMenus(-1);
+    if (this.displayedMenu) {
+      if (typeof this.displayedMenu.doAfterHiding == 'function') {
+        this.displayedMenu.doAfterHiding();
+      }
+      this.displayedMenu.displayed = false;
+      this.displayedMenu = null;
+    }
+    document.body.onselectstart = null;
+  };
+
+  // Public DOM-event handlers
+  this.handleMouseOver = function (e) {
+    var targ = e.target;
+    while (!targ.id) { targ = targ.parentNode; }
+    if (targ.id == 'body') { return false; }
+    if (targ && targ.className.indexOf('hierMenuItem') > -1) {
+      var currMenuNode = this._getMenuNodeForMenuItemNode(targ);
+      var currLevel = this._getHierarchyLevelForMenuNode(currMenuNode);
+      var nextLevel = currLevel + 1;
+      var key = targ.id.replace('hierMenuItem_', '');
+      var index = key.substr(key.length - 1); // Negative pos param breaks in IE
+      var menuItem = this.displayedMenu.getMenuItem(key);
+      var currSub = $('hierMenuLevel_' + nextLevel);
+      fleegix.css.addClass(targ, 'selectedItem');
+      if (currSub) {
+        var subKey = currSub.firstChild.firstChild.id.replace('hierMenuItem_', '');
+        if (subKey.substr(0, subKey.length - 1) == key) {
+          return false;
+        }
+        var expandedItem = this._expandedItemForEachLevel[currLevel];
+        var expandedNode = this._getMenuItemNodeForMenuItem(expandedItem);
+        fleegix.css.removeClass(expandedNode, 'selectedItem');
+        this._hideSubMenus(currLevel);
+      }
+      else if (menuItem.items && menuItem.items.length) {
+        this._expandedItemForEachLevel[currLevel] = menuItem;
+        this._xPosMarksForEachLevel[currLevel] = this._currX;
+        this._yPosMarksForEachLevel[currLevel] = this._currY;
+        var newX = this._currX + currMenuNode.offsetWidth;
+        var newY = this._currY + (index*24);
+        this._showHierMenuLevel(nextLevel, menuItem, newX, newY);
+      }
+    }
+  };
+  this.handleMouseOut = function (e) {
+    var targ = e.target;
+    while (!targ.id) { targ = targ.parentNode; }
+    if (targ.id == 'body') { return false; }
+    if (targ && targ.className.indexOf('hierMenuItem') > -1) {
+      var currMenuNode = this._getMenuNodeForMenuItemNode(targ);
+      var currLevel = this._getHierarchyLevelForMenuNode(currMenuNode);
+      var menuItem = this._getMenuItemForMenuItemNode(targ);
+      if (this._expandedItemForEachLevel[currLevel] == menuItem) {
+        return false;
+      }
+      fleegix.css.removeClass(targ, 'selectedItem');
+    }
+  };
+  this.handleClick = function (e) {
+    var targ = e.target;
+    while (!targ.id) { targ = targ.parentNode; }
+    if (targ.id == 'body') { return false; }
+    if (targ && targ.className.indexOf('hierMenuItem') > -1) {
+      var menuItem = this._getMenuItemForMenuItemNode(targ);
+      if (typeof menuItem.handleClick == 'function') {
+        setTimeout(menuItem.handleClick, 0);
+      }
+      else {
+        e.stopPropagation();
+        return false;
+      }
+    }
+    this.hideHierarchicalMenu();
+  };
+
+  // Private methods
+  this._showHierMenuLevel = function (level, menuItem, x, y) {
+    var table = _createElem('table');
+    var tbody = _createElem('tbody');
+    var tr = null;
+    var td = null;
+    var div = null;
+
+    table.cellPadding = 0;
+    table.cellSpacing = 0;
+    table.className = 'hierMenu';
+    table.id = 'hierMenuLevel_' + level;
+
+    var items = menuItem.items;
+    this._currLevel = level;
+    // User-configuratble min/max
+    var min = this.displayedMenu.minWidth;
+    var max = this.displayedMenu.maxWidth;
+    // The natural width the menu would be based on the
+    // text of the items inside -- add 4px x 2 for the
+    // margin, and 2 px for the borders so we can be
+    // talking about the width of the containing box
+    var nat = menuItem.naturalWidth + (HORIZ_MARGIN_WIDTH * 2) +
+      (BORDER_WIDTH * 2);
+
+    // Width-calc fu
+    var menuLevelWidth = 0;
+    // Min width set -- use the min if wider than
+    // the natural width
+    if (min) {
+      menuLevelWidth = min > nat ? min : nat;
+    }
+    // Otherwise just use the natural width
+    else {
+      menuLevelWidth = nat;
+    }
+    if (max) {
+      menuLevelWidth = menuLevelWidth > max ? max : menuLevelWidth;
+    }
+    if (menuItem.subItemHasSubItems) {
+      menuLevelWidth += EXPANDO_ARROW_WIDTH;
+    }
+    // Menu would extend outside the browser window
+    // X position overlap -- go into reverso mode
+    if ((x + menuLevelWidth) > fleegix.dom.getViewportWidth()) {
+      x -= menuLevelWidth;
+      if (level > 0) {
+        var parentWidth =
+          $('hierMenuLevel_' + (level - 1)).offsetWidth;
+        x -= parentWidth;
+      }
+      // A bit of backward overlap
+      x += MENU_OVERLAP;
+    }
+    else {
+      // A bit of overlap
+      x -= MENU_OVERLAP;
+    }
+    // Y position overlap -- compensate by the
+    // amount of the overlap
+    var yOver = (y + (items.length * 24)) - fleegix.dom.getViewportHeight();
+    if (yOver > 0) {
+      y -= (yOver + (BORDER_WIDTH * 2));
+    }
+
+    // Record the current XY to use for calc'ing
+    // the next sub-menu
+    this._currX = x;
+    this._currY = y;
+
+    var titleColumnWidth = menuItem.subItemHasSubItems ?
+      menuLevelWidth - EXPANDO_ARROW_WIDTH : menuLevelWidth;
+
+    table.style.width = menuLevelWidth + 'px';
+    for (var i = 0; i < items.length; i++) {
+      var item = items[i];
+      tr = _createElem('tr');
+      td = _createElem('td');
+      div = _createElem('div');
+      tr.id = 'hierMenuItem_' + item.hierarchyKey;
+      tr.className = 'hierMenuItem';
+      td.className = 'hierMenuText';
+      div.className = 'hierMenuTextClipper';
+      td.style.width = titleColumnWidth + 'px';
+      div.style.width = (titleColumnWidth -
+        (HORIZ_MARGIN_WIDTH * 2)) + 'px';
+      if (document.all) {
+        var nobr = _createElem('nobr');
+        nobr.innerHTML = item.display;
+        div.appendChild(nobr);
+      }
+      else {
+        div.innerHTML = item.display;
+      }
+      td.appendChild(div);
+      tr.appendChild(td);
+      td = _createElem('td');
+      if (menuItem.subItemHasSubItems) {
+        td.style.textAlign = 'center';
+        td.style.width = EXPANDO_ARROW_WIDTH + 'px';
+        if (item.items) {
+          td.innerHTML = '&gt;';
+        }
+      }
+      else {
+        td.style.width = '1px';
+      }
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+    }
+    tbody.appendChild(tr);
+    table.appendChild(tbody);
+
+    table.style.left = x + 'px';
+    table.style.top = y + 'px';
+    this._baseNode.appendChild(table);
+
+    fleegix.event.listen(table, 'onmouseover', this, 'handleMouseOver');
+    fleegix.event.listen(table, 'onmouseout', this, 'handleMouseOut');
+    fleegix.event.listen(table, 'onclick', this, 'handleClick');
+  };
+  this._hideSubMenus = function (level) {
+    if (!this._baseNode) { return false; }
+    this._currX = this._xPosMarksForEachLevel[level];
+    this._currY = this._yPosMarksForEachLevel[level];
+    var nextLevel = level + 1;
+    var max = this._currLevel + 1;
+    for (var n = nextLevel; n < max; n++) {
+      var removeMenu = $('hierMenuLevel_' + n);
+      delete this._expandedItemForEachLevel[n];
+      if (removeMenu) {
+        fleegix.event.unlisten(removeMenu, 'onmouseover',
+          this, 'handleMouseOver');
+        fleegix.event.unlisten(removeMenu, 'onclick',
+          this, 'handleClick');
+        this._baseNode.removeChild(removeMenu);
+      }
+    }
+  };
+  this._getHierarchyLevelForMenuNode = function (node) {
+    return parseInt(node.id.replace('hierMenuLevel_', ''));
+  };
+  this._getMenuNodeForMenuItemNode = function (node) {
+    return node.parentNode.parentNode;
+  };
+  this._getMenuItemForMenuItemNode = function (node) {
+    var key = node.id.replace('hierMenuItem_', '');
+    return this.displayedMenu.getMenuItem(key);
+  };
+  this._getMenuItemNodeForMenuItem = function (item) {
+    return $('hierMenuItem_' + item.hierarchyKey);
+  };
+};
+
+fleegix.menu.HierarchicalMenuItem = function (p) {
+  var params = p || {};
+  this.display = params.display || '';
+  this.handleClick = params.handleClick || null;
+  this.items = params.items || null;
+  this.naturalWidth = null;
+  this.subItemHasSubItems = false;
+  this.hierarchyKey = '';
+};
+
+fleegix.menu.HierarchicalMenu = function (id, items, o) {
+  this.id = id;
+  this.items = items || null;
+  this.naturalWidth = null;
+  this.subItemHasSubItems = false;
+  this.map;
+  this.displayed = false;
+
+  // User-customizable props
+  var opts = o || {};
+  // An action to perform whenever the menu is dismissed
+  // Useful, for example, for releasing control of a
+  // rollover highlight that's pinned to a contextual
+  // menu's pseudo-selected item
+  this.doAfterHiding = opts.doAfterHiding || null;
+  // Do this before showing the menu -- useful for
+  // refreshing the data for dynamic menus
+  this.doBeforeShowing = opts.doBeforeShowing || null;
+  // Force each menu section to a minimum width -- useful
+  // if the titles for a set of menu items is too short
+  // to provide a reasonable click surface. Can be used
+  // in combination with maxWidth
+  this.minWidth = opts.minWidth || null;
+  // Constrain each menu section to this max width --
+  // useful if you may have items that are ridiculously
+  // long. Can be used in conbination with minWidth
+  this.maxWidth = opts.maxWidth || null;
+
+  this.updateDisplayData();
+};
+
+// The top-level menu object is a special case of
+// the single menu item -- it is the "item" that
+// contains the sub-items shown in (the top) level 0
+// of the menu hierarchy
+fleegix.menu.HierarchicalMenu.prototype =
+  new fleegix.menu.HierarchicalMenuItem();
+
+fleegix.menu.HierarchicalMenu.prototype.updateDisplayData =
+  function () {
+  this.updateMap();
+  this.setNaturalWidths();
+};
+
+// Creates a map of the entire menu structure --
+// map keys are used as the id suffixes
+// in the DOM hierarchy of the menus, and lookup
+// happens when responding to clicks
+// '00' -> Some Item
+// '000' -> Some Sub-Item
+// '0000' -> Another Level Down
+// '0001' -> Another Level Down 2
+// '001' -> Some Other Sub-Item
+// '01' -> Another Item
+fleegix.menu.HierarchicalMenu.prototype.updateMap =
+  function () {
+  var items = this.items;
+  var map = {};
+  var mapHier = function (hierKey, hierItems) {
+    for (var i = 0; i < hierItems.length; i++) {
+      var item = hierItems[i];
+      var itemKey = hierKey + i.toString();
+      if (item.items) {
+        mapHier(itemKey, item.items);
+      }
+      item.hierarchyKey = itemKey;
+      map[itemKey] = item;
+    }
+  };
+  mapHier('0', items);
+  this.map = map;
+};
+// This is an ugly hack to measure out actual widths
+// per item-title -- the max width for the set of items
+// at a level determines the width of the menu
+// min-width is broken in FF for anything more complicated
+// than a simple div, and works not at all in IE6.
+// The other alternative would be hard-coding menu width
+// and wrapping menu items, which makes the Baby Jesus cry
+fleegix.menu.HierarchicalMenu.prototype.setNaturalWidths =
+  function () {
+  var d = _createElem('div');
+  d.style.position = 'absolute';
+  // IE6 defaults to 100% unless you give it a width
+  // FF & IE7 default to 'the minimum,' which is what we want
+  if (navigator.appVersion.indexOf('MSIE 6') > -1) {
+    d.style.width = '1%';
+  }
+  d.style.whiteSpace = 'nowrap';
+  d.style.left = '-9999999px';
+  d.style.top = '-9999999px';
+  fleegix.menu._scratchNode.appendChild(d);
+  var setWidths = function (widthItem) {
+    var items = widthItem.items;
+    if (items) {
+      var max = 0;
+      for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        d.innerHTML = item.display;
+        max = d.offsetWidth > max ? d.offsetWidth : max;
+        setWidths(item);
+        if (item.items) {
+          widthItem.subItemHasSubItems = true;
+        }
+      }
+      widthItem.naturalWidth = max;
+    }
+    else {
+      widthItem.naturalWidth = null;
+    }
+  };
+  setWidths(this);
+};
+fleegix.menu.HierarchicalMenu.prototype.getMenuItem =
+  function (key) {
+  return this.map[key];
+};
+
+// Set up the scratch node for measuring widths
+fleegix.event.listen(window, 'onload',
+  fleegix.menu, 'createScratchNode');
+// Close menus via any click on the doc body
+fleegix.event.listen(document, 'onclick',
+  fleegix.menu, 'hideHierarchicalMenu');
+
 
 if (typeof fleegix.drag == 'undefined') { fleegix.drag = {}; }
 fleegix.drag.xPos = null;
@@ -3323,236 +4245,6 @@ fleegix.template.templateTextCache = {};
 
 
 
-/*
- * Copyright 2006 Matthew Eernisse (mde@fleegix.org)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
-*/
-if (typeof fleegix == 'undefined') { fleegix = {}; }
-
-fleegix.ejs = {};
-
-fleegix.ejs.templateTextCache = {};
-
-fleegix.ejs.Template = function (p) {
-  var UNDEF;
-  var params = p || {};
-
-  this.mode = null;
-  this.templateText = params.text ||
-    // If you don't want to use Fleegix.js,
-    // override getTemplateTextFromNode to use
-    // textarea node value for template text
-    this.getTemplateTextFromNode(params.node);
-  this.afterLoaded = params.afterLoaded;
-  this.source = '';
-  this.markup = UNDEF;
-  // Try to get from URL
-  if (typeof this.templateText == 'undefined') {
-    // If you don't want to use Fleegix.js,
-    // override getTemplateTextFromUrl to use
-    // files for template text
-    this.getTemplateTextFromUrl(params);
-  }
-};
-
-fleegix.ejs.Template.prototype = new function () {
-  var _REGEX = /(<%%)|(%%>)|(<%=)|(<%#)|(<%)|(%>\n)|(%>)|(\n)/;
-  this.modes = {
-    EVAL: 'eval',
-    OUTPUT: 'output',
-    APPEND: 'append',
-    COMMENT: 'comment',
-    LITERAL: 'literal'
-  };
-  this.getTemplateTextFromNode = function (node) {
-    // Requires the fleegix.xhr module
-    if (typeof fleegix.string == 'undefined') {
-      throw('Requires fleegix.string module.'); }
-    var ret;
-    if (node) {
-      ret = node.value;
-      ret = fleegix.string.unescapeXML(ret);
-      ret = fleegix.string.trim(ret);
-    }
-    return ret;
-  };
-  this.getTemplateTextFromUrl = function (params) {
-    // Requires the fleegix.xhr module
-    if (typeof fleegix.xhr == 'undefined') {
-      throw('Requires fleegix.xhr module.'); }
-    var _this = this;
-    var url = params.url;
-    var noCache = params.preventCache || false;
-    var text = fleegix.ejs.templateTextCache[url];
-    // Found text in cache, and caching is turned on
-    if (text && !noCache) {
-      this.templateText = text;
-    }
-    // Otherwise go grab the text
-    else {
-      // Callback for setting templateText and caching --
-      // used for both sync and async loading
-      var callback = function (s) {
-        _this.templateText = s;
-        fleegix.ejs.templateTextCache[url] = s;
-        // Use afterLoaded hook if set
-        if (typeof _this.afterLoaded == 'function') {
-          _this.afterLoaded();
-        }
-      };
-      var opts;
-      if (params.async) {
-        opts = {
-          url: url,
-          method: 'GET',
-          preventCache: noCache,
-          async: true,
-          handleSuccess: callback
-        };
-        // Get templ text asynchronously, wait for
-        // loading to exec the callback
-        fleegix.xhr.send(opts);
-      }
-      else {
-        opts = {
-          url: url,
-          method: 'GET',
-          preventCache: noCache,
-          async: false
-        };
-        // Get the templ text inline and pass directly to
-        // the callback
-        text = fleegix.xhr.send(opts);
-        callback(text);
-      }
-    }
-  };
-  this.process = function (p) {
-    var params = p || {};
-    this.data = params.data || {};
-    var domNode = params.node;
-    // Cache/reuse the generated template source for speed
-    this.source = this.source || '';
-    if (!this.source) { this.generateSource(); }
-    
-    // Eval the template with the passed data
-    // Use 'with' to give local scoping to data obj props
-    // ========================
-    var _output = ''; // Inner scope var for eval output
-    with (this.data) {
-      eval(this.source); 
-    }
-    this.markup = _output;
-
-    if (domNode) {
-      domNode.innerHTML = this.markup;
-    }
-    return this.markup;
-  };
-  this.generateSource = function () {
-    var line = '';
-    var matches = this.parseTemplateText();
-    if (matches) {
-      for (var i = 0; i < matches.length; i++) {
-        line = matches[i];
-        if (line) {
-          this.scanLine(line);
-        }
-      }
-    }
-  };
-  this.parseTemplateText = function() {
-    var str = this.templateText;
-    var pat = _REGEX;
-    var result = pat.exec(str);
-    var arr = [];
-    while (result) {
-      var firstPos = result.index;
-      var lastPos = pat.lastIndex;
-      if (firstPos !== 0) {
-        arr.push(str.substring(0, firstPos));
-        str = str.slice(firstPos);
-      }
-      arr.push(result[0]);
-      str = str.slice(result[0].length);
-      result = pat.exec(str);
-    }
-    if (str !== '') {
-      arr.push(str);
-    }
-    return arr;
-  };
-  this.scanLine = function (line) {
-    var _this = this;
-    var _addOutput = function () {
-      line = line.replace(/\n/, '\\n');
-      line = line.replace(/"/g, '\\"');
-      _this.source += '_output += "' + line + '";';
-    };
-    switch (line) {
-      case '<%':
-        this.mode = this.modes.EVAL;
-        break;
-      case '<%=':
-        this.mode = this.modes.OUTPUT;
-        break;
-      case '<%#':
-        this.mode = this.modes.COMMENT;
-        break;
-      case '<%%':
-        this.mode = this.modes.LITERAL;
-        this.source += '_output += "' + line + '";';
-        break;
-      case '%>':
-      case '%>\n':
-        if (this.mode == this.modes.LITERAL) {
-          _addOutput();
-        }
-        this.mode = null;
-        break;
-      default:
-        // In script mode, depends on type of tag
-        if (this.mode) {
-          switch (this.mode) {
-            // Just executing code
-            case this.modes.EVAL:
-              this.source += line;
-              break;
-            // Exec and output
-            case this.modes.OUTPUT:
-              // Add the exec'd result to the output
-              this.source += '_output += ' + line + ';';
-              break;
-            case this.modes.COMMENT:
-              // Do nothing
-              break;
-            // Literal <%% mode, append as raw output
-            case this.modes.LITERAL:
-              _addOutput();
-              break;
-          }
-        }
-        // In string mode, just add the output
-        else {
-          _addOutput();
-        }
-    }
-  };
-};
-
-
 
 if (typeof fleegix.form == 'undefined') { fleegix.form = {}; }
 if (typeof fleegix.form.toObject == 'undefined') {
@@ -3619,85 +4311,116 @@ fleegix.form.diff = function (formUpdated, formOrig, opts) {
 
 
 
-fleegix.xml = new function (){
-  var pat = /^[\s\n\r]+|[\s\n\r]+$/g;
-  var expandToArr = function (orig, val) {
-    if (orig) {
-      var r = null;
-      if (orig instanceof Array == false) {
-        r = [];
-        r.push(orig);
-      }
-      else { r = orig; }
-      r.push(val);
-      return r;
-    }
-    else { return val; }
+if (typeof fleegix.event == 'undefined') {
+  throw('fleegix.event.delegator depends on the base fleegix.event module in fleegix.js.'); }
+
+fleegix.event.Delegator = function (containerNode, actions,
+  options) {
+  var _this = this;
+  this.containerNode = containerNode;
+  // List of CSS class names and their corresponding
+  // click-actions
+  this.actions = actions || {};
+  // Optional execution context for called actions
+  var opts = options || {};
+  this.context = opts.context || null;
+  // Assume we want to stop any further action
+  this.stopPropagation =
+    typeof opts.stopPropagation != 'undefined' ?
+    opts.stopPropagation : true;
+  this.preventDefault =
+    typeof opts.preventDefault != 'undefined' ?
+    opts.preventDefault : true;
+
+  // Add another action
+  this.addClickAction = function (className, act) {
+    this.actions[className] = act;
   };
-  // Parses an XML doc or doc fragment into a JS obj
-  // Values for multiple same-named tags a placed in
-  // an array -- ideas for improvement to hierarchical
-  // parsing from Kevin Faulhaber (kjf@kjfx.net)
-  this.parse = function (node, tagName) {
-    var obj = {};
-    var kids = [];
-    if (tagName) {
-      kids = node.getElementsByTagName(tagName);
-    }
-    else {
-      kids = node.childNodes;
-    }
-    for (var i = 0; i < kids.length; i++) {
-      var k = kids[i];
-      // Blow by the stupid Mozilla linebreak nodes
-      if (k.nodeType == 1) {
-        var key = k.tagName;
-        // Tags with content
-        if (k.firstChild) {
-          // Node has only one child, a text node -- this is a leaf
-          if(k.childNodes.length == 1) {
-            var t =  k.firstChild.nodeType;
-            // Text, CDATA, comment
-            if (t == 3 || t == 4 || t == 8) {
-              // Either set plain value, or if this is a same-named
-              // tag, start stuffing values into an array
-              obj[key] = expandToArr(obj[key],
-                k.firstChild.nodeValue.replace(pat, ''));
-            }
-          }
-          // Node has children -- branch node, recurse
-          else {
-            // Rinse and repeat
-            obj[key] = expandToArr(obj[key], this.parse(k));
+  this.getClickAction = function (e) {
+    var actions = this.actions;
+    var containerNode = this.containerNode;
+    var node = e.target;
+    var topNode = containerNode || document.body;
+    // Look upward from the click target to the
+    // a predefined parent -- if any of the parentNodes
+    // have an action class attached, return the
+    // class and bail out
+    while (node.parentNode && node != topNode) {
+      if (node.className) {
+        for (var c in actions) {
+          if (node.className == c) {
+            return c;
           }
         }
-        // Empty tags -- create an empty entry
-        else {
-          obj[key] = expandToArr(obj[key], null);
-        }
+      }
+      node = node.parentNode;
+    }
+    return null;
+  };
+  this.handleClick = function (e) {
+    var context = this.context;
+    var key = _this.getClickAction(e);
+    // If there's a CSS class in the click chain with
+    // a matching action, exec the action
+    if (key) {
+      var act = this.actions[key];
+      if (context) {
+        act.call(context, e);
+      }
+      else {
+        act(e);
+      }
+      if (this.stopPropagation) {
+        fleegix.event.stopPropagation(e);
+      }
+      if (this.preventDefault) {
+        fleegix.event.preventDefault(e);
       }
     }
-    return obj;
   };
-  // Returns a single, top-level XML document node
-  // Ideal for grabbing embedded XML data from a page
-  // (i.e., XML 'data islands')
-  this.getXMLDoc = function (id, tagName) {
-    var arr = [];
-    var doc = null;
-    if (document.all) {
-      var str = document.getElementById(id).innerHTML;
-      doc = new ActiveXObject("Microsoft.XMLDOM");
-      doc.loadXML(str);
-      doc = doc.documentElement;
+  fleegix.event.listen(containerNode, 'onclick',
+    this, 'handleClick');
+};
+
+
+if (typeof fleegix.event == 'undefined') {
+  throw('fleegix.event.delegator depends on the base fleegix.event module in fleegix.js.'); }
+
+fleegix.event.Periodic = function (func, interval, waitFirst) {
+  var _this = this;
+  var _paused = false;
+  this.func = func || null;
+  this.interval = interval || null;
+  this.waitFirst = waitFirst || false;
+  this.start = function (waitFirst) {
+    this.waitFirst = waitFirst || this.waitFirst;
+    if (this.waitFirst) {
+      setTimeout(this.run, this.interval);
     }
-    // Moz/compat can access elements directly
     else {
-      arr =
-        window.document.body.getElementsByTagName(tagName);
-      doc = arr[0];
+      this.run();
     }
-    return doc;
+  };
+  this.run = function () {
+    if (!_paused) {
+      _this.func();
+      setTimeout(_this.run, _this.interval);
+    }
+  };
+  this.pause = function () {
+    _paused = true;
+  };
+  this.resume = function () {
+    _paused = false;
+    this.run();
   };
 };
+
+// Clean up listeners
+fleegix.event.listen(window, 'onunload', function () {
+  try {
+    fleegix.event.flush();
+  }
+  catch (e) {} // Squelch
+});
 
