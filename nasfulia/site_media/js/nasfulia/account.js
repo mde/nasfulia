@@ -39,9 +39,9 @@ nasfulia.account = new function () {
         acct.username + ' on ' + acct.service_id + '</li>';
   };
   this.init = function () {
-    fleegix.event.listen($('accountsDialogLink'),
+    fleegix.event.listen($('accountDialogLink'),
       'onclick', this, 'showDialog');
-    fleegix.event.listen($('accountsDialog'),
+    fleegix.event.listen($('accountDialog'),
       'onclick', this, 'handleClick');
     /*
     fleegix.event.listen($('newAccountButton'),
@@ -59,11 +59,11 @@ nasfulia.account = new function () {
     jQuery('#accountDialog').dialog('open');
   };
   this.showForm = function () {
-    $('createFormFields').style.display = 'block';
+    $('accountFields').style.display = 'block';
     $('newAccountButton').style.display = 'none';
   };
   this.hideForm = function () {
-    $('createFormFields').style.display = 'none';
+    $('accountFields').style.display = 'none';
     $('newAccountButton').style.display = 'block';
   };
   this.saveAccount = function () {
@@ -77,7 +77,7 @@ nasfulia.account = new function () {
     var data;
     var err;
     // Serialize the data
-    data = fleegix.form.toObject($('createForm'));
+    data = fleegix.form.toObject($('account_form'));
     // Validate
     for (var d in data) {
       if (!data[d]) {
@@ -90,7 +90,7 @@ nasfulia.account = new function () {
     }
     // Otherwise submit
     else {
-      data = fleegix.form.serialize($('createForm'));
+      data = fleegix.form.serialize($('account_form'));
       fleegix.xhr.send({
         url: '/users/' + username + '/accounts.json',
         method: 'POST',
