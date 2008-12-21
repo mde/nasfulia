@@ -1,9 +1,9 @@
-  
+
 nasfulia.account = new function () {
   var _this = this;
   var _dialogExists = false;
   var _clickActions;
- 
+
   var _initActions = function () {
     _clickActions ={
       'new': _this.showForm,
@@ -25,9 +25,9 @@ nasfulia.account = new function () {
       height: '24em',
       width: '36em',
       modal: false,
-      buttons: { 
-       "Ok": function() { 
-         jQuery(this).dialog("close"); 
+      buttons: {
+       "Ok": function() {
+         jQuery(this).dialog("close");
        }
       }
     });
@@ -82,7 +82,7 @@ nasfulia.account = new function () {
       _this.renderAccounts();
       _this.hideForm();
     }
-    var username = nasfulia.user.username; 
+    var username = nasfulia.user.username;
     var data;
     var err;
     // Serialize the data
@@ -115,9 +115,9 @@ nasfulia.account = new function () {
     var elem = fleegix.event.getSrcElementByAttribute(e, 'id');
     var id = elem.id.replace(/^accountItem_/, '');
     var success = function (o) {
-      console.log(o); 
+      console.log(o);
     };
-    var username = nasfulia.user.username; 
+    var username = nasfulia.user.username;
     fleegix.xhr.send({
       url: '/users/' + username + '/accounts/' + id + '.json',
       method: 'DELETE',

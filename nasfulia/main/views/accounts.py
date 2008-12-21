@@ -29,8 +29,6 @@ class Account:
         return input.rstrip("\n")
 
     def index(self, request, format, user_id):
-        print "++++++++++"
-        print "index"
         # Can't use the login_required decorator
         # because it hijacks the 'next' redirect after login
         if request.user.is_authenticated():
@@ -82,7 +80,6 @@ class Account:
                 accounts = nasfulia_models.Account.objects.filter(user__id=id)
                 request.session['accounts'] = accounts
                 # Return the saved account
-                print account.username
                 ret = {
                     "id": acct.id,
                     "service_id": acct.service_id,
@@ -96,7 +93,7 @@ class Account:
                     ret = simplejson.dumps(ret)
                 return HttpResponse(ret, mimetype='application/' + format)
             else:
-                print form.errors
+                # print form.errors
                 return HttpResponse('error creating ' + user_id)
         else:
             return HttpResponseForbidden(
@@ -109,7 +106,29 @@ class Account:
         return HttpResponse('upate ' + user_id + ' -- ' + id)
 
     def delete(self, request, format, user_id, id):
-        return HttpResponse('delete ' + user_id + ' -- ' + id)
+        if request.user.is_authenticated():
+            account = nasfulia_models.Account.objects.get(id=id)
+            user_id = request.session.get('_auth_user_id')
+            if account.user_id == user_id:
+                account.delete()
+            else:
+                return HttpResponseForbidden(
+                    'This is not your account, dude..')
+            # Refresh cached account data
+            accounts = nasfulia_models.Account.objects.filter(user__id=id)
+            request.session['accounts'] = accounts
+            ret = {
+                "id": id
+            }
+            if format == 'xml':
+                ret = pyxslt.serialize.toString(prettyPrintXml=True, accounts=ret)
+            elif format == 'json':
+                ret = simplejson.dumps(ret)
+            return HttpResponse(ret, mimetype='application/' + format)
+        else:
+            return HttpResponseForbidden(
+                'Forbidden: Whoops, you need to be logged in for this.')
+             
 
 # RESTful dispatch wrapper
 dispatcher = Dispatcher(Account)
