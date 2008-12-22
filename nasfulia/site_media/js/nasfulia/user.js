@@ -12,5 +12,8 @@ nasfulia.user = new function () {
   this.addAccount = function (a) {
     this.accounts.addItem(a.id.toString(), a);
   };
+  this.removeAccount = function (a) {
+    this.accounts.removeItem(a.id.toString(), a);
+  };
 };
 

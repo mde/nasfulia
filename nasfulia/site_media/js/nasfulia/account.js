@@ -75,12 +75,19 @@ nasfulia.account = new function () {
     $('accountFields').style.display = 'none';
     $('account_new').style.display = 'block';
   };
+  this.clearForm = function () {
+    form = $('account_form');
+    form.service_id.selectedIndex = 0;
+    form.username.value = '';
+    form.password.value = '';
+  };
   this.saveAccount = function () {
     var success = function (o) {
       var res = eval('('+ o +')');
       nasfulia.user.addAccount(res);
       _this.renderAccounts();
       _this.hideForm();
+      _this.clearForm();
     }
     var username = nasfulia.user.username;
     var data;
@@ -117,6 +124,11 @@ nasfulia.account = new function () {
     var success = function (o) {
       console.log(o);
     };
+    var success = function (o) {
+      var res = eval('('+ o +')');
+      nasfulia.user.removeAccount(res);
+      _this.renderAccounts();
+    }
     var username = nasfulia.user.username;
     fleegix.xhr.send({
       url: '/users/' + username + '/accounts/' + id + '.json',

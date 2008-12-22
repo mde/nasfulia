@@ -1,6 +1,5 @@
 from django.http import *
 from django.shortcuts import render_to_response
-from django.core import serializers
 from django.forms import ModelForm
 from restful_dispatcher import Dispatcher
 from django.db import models
@@ -128,12 +127,11 @@ class Account:
         else:
             return HttpResponseForbidden(
                 'Forbidden: Whoops, you need to be logged in for this.')
-             
+
 
 # RESTful dispatch wrapper
 dispatcher = Dispatcher(Account)
 def dispatch(request, *a, **kw):
-    print kw
     return dispatcher.dispatch(request, *a, **kw)
 
 class AccountForm(ModelForm):
