@@ -83,7 +83,7 @@ nasfulia.account = new function () {
   };
   this.saveAccount = function () {
     var success = function (o) {
-      var res = eval('('+ o +')');
+      var res = fleegix.json.parse(o);
       nasfulia.user.addAccount(res);
       _this.renderAccounts();
       _this.hideForm();
@@ -125,7 +125,7 @@ nasfulia.account = new function () {
       console.log(o);
     };
     var success = function (o) {
-      var res = eval('('+ o +')');
+      var res = fleegix.json.parse(o);
       nasfulia.user.removeAccount(res);
       _this.renderAccounts();
     }

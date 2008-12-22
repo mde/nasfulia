@@ -9,8 +9,8 @@ from datetime import datetime
 from random import randrange
 from Crypto.Cipher import Blowfish
 from base64 import b64encode, b64decode
-import simplejson
-import pyxslt.serialize
+from nasfulia.main.lib.display import *
+
 
 class Account:
     def __encrypt_password(self, username, password_text):
@@ -34,21 +34,8 @@ class Account:
             accounts = request.session['accounts']
             # File extension -- json/xml
             if format:
-                ret = []
-                def map_acct(acct):
-                    ret.append({
-                        "id": acct.id,
-                        "service_id": acct.service_id,
-                        "username": acct.username,
-                        "enabled": acct.enabled,
-                        "post_only": acct.post_only
-                    })
-                map(map_acct, accounts)
-                if format == 'xml':
-                    ret = pyxslt.serialize.toString(prettyPrintXml=True, accounts=ret)
-                elif format == 'json':
-                    ret = simplejson.dumps(ret)
-                return HttpResponse(ret, mimetype='application/' + format)
+              accounts = format_data(accounts, 'account', True)
+              return display_data(accounts, format)
             # No extension, render template
             else:
                 return HttpResponseNotAcceptable('Not a supported format.')
@@ -99,7 +86,9 @@ class Account:
                 'Forbidden: Whoops, you need to be logged in for this.')
 
     def show(self, request, format, user_id, id):
-        return HttpResponse('show ' + user_id + ' -- ' + id)
+        account = nasfulia_models.Account.objects.get(id=id)
+        account = format_data(account, 'account', False)
+        return display_data(account, format)
 
     def update(self, request, format, user_id, id):
         return HttpResponse('upate ' + user_id + ' -- ' + id)
@@ -110,20 +99,14 @@ class Account:
             user_id = request.session.get('_auth_user_id')
             if account.user_id == user_id:
                 account.delete()
+                # Refresh cached account data
+                accounts = nasfulia_models.Account.objects.filter(user__id=id)
+                request.session['accounts'] = accounts
+                account = {"id": id}
+                return display_data(account, format)
             else:
                 return HttpResponseForbidden(
                     'This is not your account, dude..')
-            # Refresh cached account data
-            accounts = nasfulia_models.Account.objects.filter(user__id=id)
-            request.session['accounts'] = accounts
-            ret = {
-                "id": id
-            }
-            if format == 'xml':
-                ret = pyxslt.serialize.toString(prettyPrintXml=True, accounts=ret)
-            elif format == 'json':
-                ret = simplejson.dumps(ret)
-            return HttpResponse(ret, mimetype='application/' + format)
         else:
             return HttpResponseForbidden(
                 'Forbidden: Whoops, you need to be logged in for this.')
