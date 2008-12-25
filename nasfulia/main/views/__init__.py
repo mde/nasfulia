@@ -8,7 +8,7 @@ from nasfulia.main.models import Account
 import simplejson
 
 def home(request):
-    accounts = request.session['accounts']
+    accounts = request.session.get('accounts')
     ret = []
     def map_acct(acct):
         ret.append({
