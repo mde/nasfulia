@@ -12,17 +12,13 @@
 <script type="text/javascript" charset="utf-8">
   jQuery.noConflict();
 </script>
-<script type="text/javascript"
-  src="/site_media/js/lib/jquery/jquery-ui/jquery-ui-1.6rc2.js"></script>
-<script type="text/javascript"
-  src="/site_media/js/lib/fleegix_js/fleegix.js.uncompressed.js"></script>
+<script type="text/javascript" src="/site_media/js/lib/jquery/jquery-ui/jquery-ui-1.6rc2.js"></script>
+<script type="text/javascript" src="/site_media/js/lib/fleegix_js/fleegix.js.uncompressed.js"></script>
 
-<script type="text/javascript"
-  src="/site_media/js/nasfulia/app.js"></script>
-<script type="text/javascript"
-  src="/site_media/js/nasfulia/user.js"></script>
-<script type="text/javascript"
-  src="/site_media/js/nasfulia/account.js"></script>
+<script type="text/javascript" src="/site_media/js/nasfulia/app.js"></script>
+<script type="text/javascript" src="/site_media/js/nasfulia/user.js"></script>
+<script type="text/javascript" src="/site_media/js/nasfulia/account.js"></script>
+<script type="text/javascript" src="/site_media/js/nasfulia/notice.js"></script>
 
 <script type="text/javascript">
   nasfulia.home = new function () {
@@ -33,6 +29,9 @@
       nasfulia.account.init();
       if (nasfulia.user.accounts.count == 0) {
         nasfulia.account.showDialog();
+      }
+      else {
+        nasfulia.notice.init();
       }
     };
   };

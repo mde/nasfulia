@@ -1,5 +1,4 @@
 from django.http import *
-from django.shortcuts import render_to_response
 from django.forms import ModelForm
 from restful_dispatcher import Dispatcher
 from django.db import models
@@ -31,7 +30,7 @@ class Account:
         # Can't use the login_required decorator
         # because it hijacks the 'next' redirect after login
         if request.user.is_authenticated():
-            accounts = request.session['accounts']
+            accounts = request.session.get('accounts')
             # File extension -- json/xml
             if format:
               accounts = format_data(accounts, 'account', True)
@@ -61,23 +60,13 @@ class Account:
                 form.cleaned_data['password'] = self.__encrypt_password(
                     user.username, form.cleaned_data['password'])
                 # Save the new account
-                acct = form.save()
+                account = form.save()
                 # Refresh cached account data
                 accounts = nasfulia_models.Account.objects.filter(user__id=user_id)
                 request.session['accounts'] = accounts
-                # Return the saved account
-                ret = {
-                    "id": acct.id,
-                    "service_id": acct.service_id,
-                    "username": acct.username,
-                    "enabled": acct.enabled,
-                    "post_only": acct.post_only
-                }
-                if format == 'xml':
-                    ret = pyxslt.serialize.toString(prettyPrintXml=True, accounts=ret)
-                elif format == 'json':
-                    ret = simplejson.dumps(ret)
-                return HttpResponse(ret, mimetype='application/' + format)
+                # Format and return response
+                account = format_data(account, 'account', False)
+                return display_data(account, format)
             else:
                 # print form.errors
                 return HttpResponse('error creating ' + username)
@@ -102,11 +91,12 @@ class Account:
                 # Refresh cached account data
                 accounts = nasfulia_models.Account.objects.filter(user__id=user_id)
                 request.session['accounts'] = accounts
+                # Format and return response
                 account = {"id": id}
                 return display_data(account, format)
             else:
                 return HttpResponseForbidden(
-                    'This is not your account, dude..')
+                    'This is not your account, dude.')
         else:
             return HttpResponseForbidden(
                 'Forbidden: Whoops, you need to be logged in for this.')

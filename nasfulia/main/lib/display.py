@@ -11,6 +11,8 @@ __maps = {
       'enabled',
       'post_only'
   ],
+  'notice': [
+  ],
   'track': [] 
 }
 
@@ -48,7 +50,7 @@ def display_data(data, format):
     ret = data
     if format == 'xml':
         ret = pyxslt.serialize.toString(prettyPrintXml=True,
-            accounts=ret)
+            data=ret)
     elif format == 'json':
         ret = simplejson.dumps(ret)
     return HttpResponse(ret, mimetype='application/' + format)

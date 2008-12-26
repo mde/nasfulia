@@ -14,8 +14,11 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     # (r'^admin/(.*)', admin.site.root),
+    (r'^users/(?P<username>[^\/]+)/stream((?:.)(?P<format>[^\/]+))?$', 'nasfulia.main.views.stream.index'),
     (r'^users/(?P<username>[^\/]+)/accounts/(?P<id>\d+)((?:.)(?P<format>[^\/]+))?$', 'nasfulia.main.views.accounts.dispatch'),
     (r'^users/(?P<username>[^\/]+)/accounts((?:.)(?P<format>[^\/]+))?$', 'nasfulia.main.views.accounts.dispatch'),
+    (r'^users/(?P<username>[^\/]+)/notices/(?P<id>\d+)((?:.)(?P<format>[^\/]+))?$', 'nasfulia.main.views.notices.dispatch'),
+    (r'^users/(?P<username>[^\/]+)/notices((?:.)(?P<format>[^\/]+))?$', 'nasfulia.main.views.notices.dispatch'),
     (r'^login/$', 'django.contrib.auth.views.login'),
     (r'^profile$', 'nasfulia.main.views.profile'),
     (r'^home$', 'nasfulia.main.views.home'),
