@@ -1,4 +1,8 @@
 from django.http import *
+import httplib2
+from nasfulia.main.models import Account
+import simplejson
+import pyxslt.serialize
 
 def index(request, format, username):
     accounts = request.session.get('accounts')
@@ -9,8 +13,8 @@ def index(request, format, username):
         constr = __services[account.service_id]['constructor']
         print constr.__name__
         service = constr(account)
-        print service.account.username
-    
+        service.fetch()
+
     map(fetch_notices, accounts)
     return HttpResponse('stream for ' + username)
 
@@ -22,9 +26,22 @@ class Twitter(Service):
     def __init__(self, account):
         Service.__init__(self, account)
 
+    def fetch(self):
+        url = 'http://twitter.com/statuses/friends_timeline.json'
+        http = httplib2.Http()
+        account = self.account
+        password = Account.decrypt_password(username,
+            self.account.password)
+        http.add_credentials(username, password)
+        response, content = http.request(url)
+        print content
+
 class Identica(Service):
     def __init__(self, account):
         Service.__init__(self, account)
+
+    def fetch(self):
+        pass
 
 __services = {
   'http://twitter.com/': {
