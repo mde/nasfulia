@@ -5,27 +5,9 @@ from django.db import models
 from nasfulia.main import models as nasfulia_models
 from django.contrib.auth.models import User
 from datetime import datetime
-from random import randrange
-from Crypto.Cipher import Blowfish
-from base64 import b64encode, b64decode
 from nasfulia.main.lib.display import *
 
-
 class Account:
-    def __encrypt_password(self, username, password_text):
-        c = Blowfish.new(username)
-        return b64encode(c.encrypt(self.__pad(password_text)))
-
-    def __decrypt_password(self, username, crypted_text):
-        c = Blowfish.new(username)
-        return self.__depad(c.decrypt(b64decode(crypted_text)))
-
-    def __pad(self, input):
-        return input + "".join(["\n" for i in xrange(8 - len(input) % 8)])
-
-    def __depad(self, input):
-        return input.rstrip("\n")
-
     def index(self, request, format, username):
         # Can't use the login_required decorator
         # because it hijacks the 'next' redirect after login
@@ -57,8 +39,8 @@ class Account:
             form = AccountForm(data=request.POST, instance=account)
             if form.is_valid():
                 # Encrypt the password
-                form.cleaned_data['password'] = self.__encrypt_password(
-                    user.username, form.cleaned_data['password'])
+                form.cleaned_data['password'] = nasfulia_models.Account.encrypt_password(
+                    form.cleaned_data['username'], form.cleaned_data['password'])
                 # Save the new account
                 account = form.save()
                 # Refresh cached account data
