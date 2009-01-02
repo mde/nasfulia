@@ -39,14 +39,18 @@ nasfulia.notice.account = new function () {
     var li;
     var html;
     this.data.eachValue(function (val) {
-      li = $elem('li');
+      li = $elem('li', { className: 'notice' });
       html = '';
-      html += '<div>' + val.user.screen_name + '</div>';
-      html += '<div>' + val.text + '</div>';
+      //html += '<div><img src="' + val.user.profile_image_url + '" alt=""/></div>';
+      html += '<a class="thumb" href="">';
+      html += '<img src="/site_media/images/mde_side_bw.png" alt=""/>';
+      html += '</a>';
+      html += '<a href="">' + val.user.screen_name + '</a> ';
+      html += val.text;
       li.innerHTML = html;
       ul.appendChild(li);
     });
-    $('content').innerHTML = '';
-    $('content').appendChild(ul);
+    $('notices').innerHTML = '';
+    $('notices').appendChild(ul);
   };
 };
