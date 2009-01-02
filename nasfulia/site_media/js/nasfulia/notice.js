@@ -43,7 +43,7 @@ nasfulia.notice.account = new function () {
       html = '';
       //html += '<div><img src="' + val.user.profile_image_url + '" alt=""/></div>';
       html += '<a class="thumb" href="">';
-      html += '<img src="/site_media/images/mde_side_bw.png" alt=""/>';
+      html += '<img src="' + val.user.profile_image_url + '" alt=""/>';
       html += '</a>';
       html += '<a href="">' + val.user.screen_name + '</a> ';
       html += val.text;

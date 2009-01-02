@@ -1,12 +1,7 @@
-* {
-  font-family: "Lucida Grande", "Verdana", sans-serif;
-}
+/* Begin global stuff */
+/*****************************/
 a {
-  color: #864612;
   cursor: pointer;
-  border-style: dotted;
-  border-width: 0 0 1px 0;
-  text-decoration: none;
 }
 a:hover {
   border-style: solid;
@@ -20,4 +15,58 @@ a img {
 .floatRight {
   float: right;
 }
+.clearBoth {
+  clear: both;
+}
+/* End global stuff */
+
+/* Begin base layout */
+/*****************************/
+#content {
+  width: 68em;
+  margin: auto;
+  overflow: hidden;
+}
+#leftCol {
+  width: 14em;
+  float: left;
+  margin-right: 2em;
+}
+#centerCol {
+  width: 36em;
+  float: left;
+}
+#rightCol {
+  width: 14em;
+  clear: right;
+  float: left;
+  margin-left: 2em;
+}
+/* Begin base layout */
+
+/* Begin account / tracking dialog  styles */
+/*****************************/
+#accountFields {
+  padding-bottom: 1em;
+  border-bottom: 1px solid #ccc;
+  display: none;
+  overflow: hidden;
+}
+#accountDialog {
+  display: none;
+  padding: 0;
+  margin: 0;
+}
+#accountDialog .padding {
+  padding: 1em;
+}
+#accountDialog .headerForm {
+  overflow: hidden /* Clear floats */
+}
+#accountDialog .noResults {
+  margin-top: 1em;
+  color: #999;
+  text-align: center;
+}
+/* End account / tracking dialog  styles */
 

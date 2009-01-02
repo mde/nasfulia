@@ -43,80 +43,75 @@
 
 <link rel="stylesheet" href="/site_media/css/global.css"
   type="text/css" media="screen">
+<link rel="stylesheet" href="/site_media/themes/default/css/master.css"
+  type="text/css" media="screen">
 <link rel="stylesheet" href="/site_media/css/jquery-ui-themeroller.css"
   type="text/css" media="screen">
 
 <style type="text/css">
-  #accountFields {
-    padding-bottom: 1em;
-    border-bottom: 1px solid #ccc;
-    display: none;
-    overflow: hidden;
-  }
-  #accountDialog {
-    display: none;
-    padding: 0;
-    margin: 0;
-  }
-  #accountDialog .padding {
-    padding: 1em;
-  }
-  /* Clear floats inside this container */
-  #accountDialog .headerForm {
-    overflow: hidden
-  }
-  #accountDialog .noResults {
-    margin-top: 1em;
-    color: #999;
-    text-align: center;
-  }
   #content {
     text-align: center;
   }
   #notices {
+    background-color: #fff;
+    padding: 0.8em;
     margin: auto;
-    width: 36em;
+    width: 32em;
     text-align: left;
   }
   #notices ul {
     list-style: none;
+    margin: 0;
+    padding: 0;
   }
   #notices li {
-    /* Clear any contained floats */
-    overflow: hidden;
+    overflow: hidden; /* Clear floats */
+    font-size: 80%;
     margin: 0 0 0.8em 0;
   }
   #notices li a.thumb {
+    border: 0;
     display: block;
     float: left;
-    width: 70px;
-    height: 60px;
+    width: 58px;
+    height: 48px;
   }
   #notices li img {
-    width: 60px;
-    height: 60px;
+    width: 48px;
+    height: 48px;
     border: 1px solid #ccc;
   }
 </style>
 
 </head>
   <body>
-    <div id="header">
-      <div id="mainNav">
-        <a id="accountDialogLink">
-          Accounts
-        </a>
+    <!-- Begin main page layout -->
+    <div id="container">
+      <div id="header">
+        <a class="logo" href="/home"></a>
+        <div class="navigation">
+          <a id="accountDialogLink">
+            Accounts
+          </a>
+        </div>
+      </div>
+      <div id="content">
+        <div id="leftCol">&nbsp;</div>
+        <div id="centerCol">
+          <div id="notices">
+            <!-- Notice list rendered here -->
+          </div>
+        </div>
+        <div id="rightCol">&nbsp;</div>
       </div>
     </div>
-    <div id="content">
-      <div id="notices">
-      </div>
-    </div>
-    <!--  Accounts dialog start -->
+    <!-- End main page layout -->
+
+    <!-- Start accounts/tracking dialog -->
     <div id="accountDialog" title="Accounts">
       <form id="account_form" method="post">
         <div class="padding">
-          <div class="headerForm">
+          <div>
             <div class="floatRight">
               <input type="button" class="new" id="account_new"
                 name="new" value="New Account"/>
@@ -173,6 +168,6 @@
         </form>
       </div>
     </div>
-    <!--  Accounts dialog end -->
+    <!-- End accounts/tracking dialog -->
   </body>
 </html>
