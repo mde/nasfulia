@@ -12,27 +12,45 @@ nasfulia.notice.account = new function () {
   this.fetch = function () {
     var username = nasfulia.user.username;
     var success = function (o) {
-      var notices = fleegix.json.parse(o);
+      var ret = fleegix.json.parse(o);
+     
+      // Errors
+      // FIXME: Handle errors in a nice way
+      var errors = ret.errors;
+      var error;
+      if (errors && errors.length) {
+        var msg = '';
+        for (var e in errors) {
+          error = errors[e];
+          msg += 'Account: ' + error.account.username + ' on ' +
+            error.account.service_name + '\n';
+          msg += 'Error: ' + error.status;
+          msg += '\n\n';
+        }
+        alert(msg);
+      }
+      
+      // Actual response data
+      var notices = ret.notices;
       var notice;
-      console.log(notices);
       for (var i = 0; i < notices.length; i++) {
         notice = notices[i];
         _this.data.addItem(notice.id.toString(), notice);
       }
       _this.display();
     };
-    /*
     fleegix.xhr.send({
       url: '/users/' + username + '/stream.json',
       method: 'GET',
       handleSuccess: success
     });
-    */
+    /*
     fleegix.xhr.send({
       url: '/site_media/twitter.json',
       method: 'GET',
       handleSuccess: success
     });
+    */
   };
   this.display = function () {
     var ul = $elem('ul');
