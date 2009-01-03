@@ -11,22 +11,23 @@ class Notice(models.Model):
     created_at = models.DateTimeField()
 
 class Account(models.Model):
-    @staticmethod
-    def encrypt_password(username, password_text):
+    @classmethod
+    def encrypt_password(cls, username, password_text):
         c = Blowfish.new(username)
-        return b64encode(c.encrypt(Account.__pad(password_text)))
+        return b64encode(c.encrypt(cls._pad(password_text)))
 
-    @staticmethod
-    def decrypt_password(username, crypted_text):
+    @classmethod
+    def decrypt_password(cls, username, crypted_text):
+        print cls
         c = Blowfish.new(username)
-        return Account.__depad(c.decrypt(b64decode(crypted_text)))
+        return cls._depad(c.decrypt(b64decode(crypted_text)))
 
-    @staticmethod
-    def __pad(input):
+    @classmethod
+    def _pad(cls, input):
         return input + "".join(["\n" for i in xrange(8 - len(input) % 8)])
 
-    @staticmethod
-    def __depad(input):
+    @classmethod
+    def _depad(cls, input):
         return input.rstrip("\n")
 
     user = models.ForeignKey(User)
