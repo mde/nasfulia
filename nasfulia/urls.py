@@ -26,3 +26,4 @@ urlpatterns = patterns('',
         {'document_root': '/home/mde/html/nasfulia/nasfulia/site_media'}),
 )
 
+
