@@ -1,0 +1,53 @@
+<script type="text/javascript">
+  nasfulia.accounts = new function () {
+    this.reloadForNetwork = function (sel) {
+      var base = fleegix.uri.getBase(location.href);
+      location = base + '?network=' + sel;
+    };
+  };
+</script>
+
+<%
+services = Service::registered_modules
+cfg = {:username_name => 'Username', :password_name => 'Password'}
+service = services[params[:network]]
+cfg = service ? service::config : cfg
+if cfg[:password_url]
+  password_url = '<a href="' + cfg[:password_url] + '">[WTF?]</a>'
+end
+%>
+
+<h1>Add a new social network account</h1>
+
+<p>
+  <form id="account_form" method="post" action="/users/<%= current_user.login %>/accounts">
+    <div>
+      Social Network
+    </div>
+    <div>
+      <select id="account_network_id" name="account[network_id]"
+        onchange="nasfulia.accounts.reloadForNetwork(this.options[this.selectedIndex].value);">
+        <option value="">(Select a social network)</option>
+      <% services.each do |k, v| %>
+        <option value="<%= k %>"<%= ' selected' if k == params[:network] %>><%= v::config[:display] %></option>
+      <% end %>
+      </select>
+    </div>
+    <div>
+      <%= cfg[:username_name] %>
+    </div>
+    <div>
+      <input type="text" id="account_username" name="account[username]" value=""/>
+    </div>
+    <div>
+      <%= cfg[:password_name] %>
+      <%= password_url %>
+    </div>
+    <div>
+      <input type="password" id="account_password" name="account[password]" value=""/>
+    </div>
+    <div>
+      <input type="submit" id="account_submit" name="account[submit]" value="Save"/>
+    </div>
+  </form>
+</p>

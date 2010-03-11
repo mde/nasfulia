@@ -1,0 +1,80 @@
+<%
+msg = @msg || "Fill in the form below, and click the Log In button."
+%>
+<script type="text/javascript">
+  nasfulia.login = new function () {
+    this.init = function () {
+      $('login_form').login.focus();
+    };
+  };
+  fleegix.event.listen(window, 'onload',
+    nasfulia.login, 'init');
+</script>
+
+<style type="text/css">
+  #loginFormContainer {
+    margin: auto;
+    color: #222;
+    margin-top: 24px;
+    width: 420px;
+    padding: 12px;
+    border: 1px solid #dca;
+    background-image: url(/images/nasfulia_notifications_bg.png);
+    background-repeat: repeat-x;
+    background-position: top left;
+  }
+  #loginFormContainer .detail {
+    font-size: 90%;
+  }
+  #loginButtonContainer {
+    text-align: right;
+    margin-bottom: 8px;
+  }
+  #signupLink {
+    margin: auto;
+    width: 380px;
+    text-align: center;
+    font-size: 90%;
+  }
+  #loginPromptContainer {
+    height: 2.6em;
+    font-size: 90%;
+  }
+</style>
+
+<div id="loginFormContainer" class="borderBox">
+  <div id="loginPromptContainer">
+    <%= msg %>
+  </div>
+  <form method="post" action="/login" id="login_form">
+    <div class="formLabel">
+      Login ID
+    </div>
+    <div>
+      <input type="text" class="text" name="login" value="<%= params[:login] %>"/>
+    </div>
+    <div class="formLabel">
+      Password
+    </div>
+    <div>
+      <input type="password" class="password"
+        name="password"/></p>
+    </div>
+    <div class="detail">
+      Remember me:
+      <input type="hidden" class="hidden" name="remember_me" value="0"/>
+      <input type="checkbox" class="checkbox" value="1" name="remember_me"/>
+    </div>
+    <div id="loginButtonContainer">
+      <input type="submit" class="btn" value="Log In"/>
+    </div>
+  </form>
+  <hr/>
+  <div id="signupLink">
+    <a href="/signup">
+      Sign up for an account
+    </a>
+  </div>
+</div>
+
+

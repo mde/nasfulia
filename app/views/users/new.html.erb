@@ -1,0 +1,94 @@
+<script type="text/javascript">
+
+nasfulia = {};
+nasfulia.signup = new function () {
+  var _this = this;
+  this.submit = function () {
+    var info = fleegix.form.serialize($('signupForm'));
+    fleegix.xhr.send({
+      url: '/users',
+      method: 'post',
+      data: info,
+      handleSuccess: _this.handleSubmit
+    });
+  };
+  this.handleSubmit = function (s) {
+    if (s == 'ok') {
+      $('signupFormContainer').innerHTML = '<div>Your signup was successful. Please check your e-mail for a message to activate your account.</div><div><a href="/login">Click here to log in.</a></div>';
+    }
+    else {
+      $('errorText').innerHTML = s;
+    }
+  };
+};
+
+</script>
+
+<% params[:user] = {} unless params[:user] %>
+
+<style type="text/css">
+  #signupFormContainer {
+    margin: auto;
+    margin-top: 24px;
+    width: 380px;
+    padding: 12px;
+  }
+  #signupButtonContainer {
+    text-align: right;
+  }
+</style>
+
+<div id="signupFormContainer" class="borderBox">
+  <span id="errorText">
+    <%= error_messages_for @user %>
+  </span>
+  <form id="signupForm" method="post" action="/users">
+    <div>
+      Login
+    </div>
+    <div>
+      <input type="text" class="text"
+        name="user[login]"
+        value="<%= params[:user][:login] || '' %>"
+        id="user_login"/>
+    </div>
+    <div>
+      E-mail
+    </div>
+    <div>
+      <input type="text" class="text"
+        name="user[email]"
+        value="<%= params[:user][:email] %>"
+        id="user_email"/>
+    </div>
+    <div>
+      Password
+    </div>
+    <div>
+      <input type="password" class="password"
+        name="user[password]" id="user_password"/>
+    </div>
+    <div>
+      Password Confirmation
+    </div>
+    <div>
+      <input type="password" class="password"
+        name="user[password_confirmation]"
+        id="user_password_confirmation"/>
+    </div>
+    <!--
+    <div>
+      Invitation Code
+    </div>
+    <div>
+      <input type="text" class="text"
+      name="user[invitation_code]"
+      value="<%= params[:user][:invitation_code] %>"
+      id="user_invitation_code"/>
+    </div>
+    -->
+    <div id="signupButtonContainer">
+      <button type="submit" onclick="nasfulia.signup.submit(); return false;">Sign up</button>
+    </div>
+  </form>
+</div>

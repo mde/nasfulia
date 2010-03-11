@@ -1,0 +1,77 @@
+    <script type="text/javascript" src="/js/nasfulia/base.js"></script>
+    <script type="text/javascript" src="/js/nasfulia/track.js"></script>
+    <script type="text/javascript" src="/js/nasfulia/req.js"></script>
+    <script type="text/javascript">
+      nasfulia.currentUser.accountsData = <%= @accounts.to_json %>;
+      nasfulia.currentUser.tracks = <%= @tracks.to_json %>;
+      nasfulia.currentUser.login = '<%= current_user.login %>';
+      nasfulia.home.pollInterval = <%= POLL_INTERVAL %>;
+      fleegix.event.listen(window, 'onload', nasfulia.app, 'init');
+    </script>
+    <link rel="stylesheet" href="/css/home.css"
+      type="text/css" media="screen" charset="utf-8" />
+      <div id="header">
+        <a class="logo" href="/"></a>
+        <div id="navigation">
+          <!-- <a onclick="nasfulia.ui.openModalDialog();">Dialog</a>
+          |-->
+          <a href="/users/<%= current_user.login %>/accounts">Accounts</a>
+          |
+          <a href="/users/<%= current_user.login %>/tracks">Tracking</a>
+          |
+          <a href="/logout">Log Out</a>
+        </div>
+      </div>
+      <div id="content">
+        <div id="leftCol">
+          &nbsp;
+        </div>
+        <div id="centerCol">
+          <div id="noticeUpdateContainer">
+            <form id="noticeUpdateForm" action="">
+              <h3 id="noticeUpdateHeader">
+                So ... what's up?
+              </h3>
+              <div id="throbberContainer" style="display: none;">
+                <img src="/images/ajax-loader.gif"/>
+              </div>
+              <div class="clearBoth"></div>
+              <div id="noticeTextContainer">
+                <textarea id="noticeUpdateText" name="text"></textarea>
+                <input type="hidden" id="noticeUpdateAccounts"
+                  name="accounts" value=""/>
+              </div>
+              <div id="noticeLengthPrompt">
+                <span id="lengthCount">140</span>
+              </div>
+              <div id="noticeButtonContainer">
+                <input type="button" class="btn" id="noticeUpdateButton"
+                  name="noticeUpdateButton" value="Submit"/ disabled="disabled">
+              </div>
+              <div id="submitToLinkContainer">
+                <a class="toggleLinkDisabled" id="noticeUpdateToLink">
+                  [Submit To ...]
+                </a>
+              </div>
+              <div class="clearBoth"></div>
+            </form>
+          </div>
+          <hr/>
+          <div id="noticeListNavigation">
+            <a id="resortNoticeList">[Re-Sort]</a>
+          </div>
+          <div id="noticeListContainer">
+            <div id="loadingPrompt" class="borderBox">
+              <div id="loadingPromptText">
+                Loading ...
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="rightCol">
+          <div id="notificationsContainer">
+           &nbsp;
+          <div>
+        </div>
+      </div>
+

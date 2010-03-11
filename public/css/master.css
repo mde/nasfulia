@@ -1,0 +1,180 @@
+*{
+  font-family: "Lucida Grande", "Verdana", sans-serif;
+}
+html,body {
+  height: 100%;
+  text-align:center;
+  margin: 0px;
+  padding: 0px;
+}
+body {
+  background-image: url(/images/nasfulia_page_bg.png);
+  background-repeat: repeat-x;
+  background-color: #7dc78a;
+  background-attachment: fixed;
+}
+#container {
+  background-image: url(/images/nasfulia_content_bottom_bg.png);
+  background-position: bottom left;
+  background-repeat: repeat-x;
+  background-attachment: fixed;
+}
+table {
+  border-collapse: collapse;
+}
+td {
+  vertical-align: top;
+}
+p {
+  margin-top: 0px;
+  padding-top: 0px;
+}
+form {
+  display: inline;
+}
+a {
+  color: #864612;
+  cursor: pointer;
+  border-style: dotted;
+  border-width: 0 0 1px 0;
+  text-decoration: none;
+}
+a:hover {
+  border-style: solid;
+}
+a img {
+  border: 0;
+}
+a.logo {
+  border: 0;
+}
+hr {
+  border: 0px;
+  height: 1px;
+  background: #a7d6b8;
+  color: #fff;
+  font-size: 0px;
+  line-height: 1px;
+  margin: 2px 0 8px;
+}
+h3 {
+  color: #ece7d6;
+}
+.clearBoth {
+  clear: both;
+}
+.borderBox {
+  background-color: #fff;
+  border: 1px solid #ccc;
+}
+form input.btn {
+  min-width: 84px;
+  height: 22px;
+  font-size: 80%;
+  color: #542;
+  letter-spacing: 0.5px;
+  border-style: solid;
+  border-color: #dca #875 #875 #dca;
+  border-width: 1px;
+  background-image: url(/images/button_bgs.gif);
+  background-repeat: repeat-x;
+  background-position: 0px 0px;
+  padding: 0px;
+  margin: 0px;
+  cursor: pointer;
+}
+.formLabel {
+  font-weight: bold;
+  color: #aaa;
+}
+.miniDialogTable {
+  background-color: #eee;
+  border: 1px solid #ddd;
+}
+.miniDialogButtonPanelContainer {
+  height: 36px;
+  padding: 8px;
+}
+.toggleLink {}
+.toggleLinkDisabled {
+  color: #ddd;
+  cursor: default;
+}
+#container {
+  position: relative;
+  margin: auto;
+  text-align: left;
+  overflow: hidden;
+  min-height: 100%;
+}
+
+.dialogContainer {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  visibility: hidden;
+  z-index: -999999;
+}
+.dialogTopLeft {
+  width: 50px;
+  height: 34px;
+  background-image: url(/images/jeeoh_dialog_slices_03.png);
+}
+.dialogTop {
+  height: 34px;
+  background-image: url(/images/jeeoh_dialog_slices_04.png);
+  background-repeat: repeat-x;
+}
+.dialogTopRight {
+  width: 50px;
+  height: 34px;
+  background-image: url(/images/jeeoh_dialog_slices_05.png);
+}
+.dialogLeft {
+  background-image: url(/images/jeeoh_dialog_slices_07.png);
+  background-repeat: repeat-y;
+}
+.dialogContent {
+  vertical-align: top;
+  background: #fff
+}
+.dialogRight {
+  background-image: url(/images/jeeoh_dialog_slices_09.png);
+  background-repeat: repeat-y;
+}
+.dialogBottomLeft {
+  width: 50px;
+  height: 76px;
+  background-image: url(/images/jeeoh_dialog_slices_10.png);
+}
+.dialogBottom {
+  height: 76px;
+  background-image: url(/images/jeeoh_dialog_slices_11.png);
+  background-repeat: repeat-x;
+  vertical-align: middle;
+}
+.dialogBottomRight {
+  width: 50px;
+  height: 76px;
+  background-image: url(/images/jeeoh_dialog_slices_12.png);
+}
+.dialogTitle {
+  position: relative;
+  font-weight: bold;
+  float: left;
+  margin-left: -10px;
+  padding-top: 8px;
+  color: #fff;
+}
+.dialogClose {
+  position: relative;
+  float: right;
+  margin-right: -20px;
+  cursor: pointer;
+  width: 21px;
+  height: 34px;
+}
+.dialogCloseIcon {
+  margin-top: 7px;
+}
+

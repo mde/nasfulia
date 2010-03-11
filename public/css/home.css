@@ -1,0 +1,203 @@
+#header {
+  position: relative;
+  overflow: hidden;
+  max-width: 68em;
+  margin: auto;
+}
+#header a.logo {
+  display: block;
+  float: left;
+  background-image: url(/images/nasfulia_logo.png);
+  background-repeat: no-repeat;
+  width: 353px;
+  height: 45px;
+  margin: 8px 0 0 8px;
+}
+#navigation {
+  float: right;
+  padding-top: 8px;
+  color: #dba;
+}
+#navigation a {
+  color: #fff;
+}
+#content {
+  width: 68em;
+  margin: auto;
+}
+#leftCol {
+  width: 14em;
+  float: left;
+  margin-right: 2em;
+}
+#centerCol {
+  width: 36em;
+  float: left;
+}
+#rightCol {
+  width: 14em;
+  clear: right;
+  float: left;
+  margin-left: 2em;
+}
+#noticeListNavigation {
+  margin: 1em 0.1em 0.6em 0;
+  font-size: 90%;
+  text-align: right;
+}
+#noticeListNavigation a {
+  color: #fff;
+  border: 0;
+}
+#noticeListNavigation a:hover {
+}
+
+/* List-item styles */
+#noticeListContainer {
+  font-size: 12px;
+  background-color: #fff;
+  margin: 0 0 2em 0;
+}
+#noticeList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+#noticeList li {
+  line-height: 140%;
+  overflow: hidden;
+  border-bottom: 1px solid #ddd;
+  padding: 0.6em 0 0.8em 0;
+  margin: 0 0.6em 0 0.6em; 
+}
+#noticeList li a:hover {
+  background-color: #fffbdc;
+}
+#noticeList li a.thumb {
+  position: relative;
+  display: block;
+  float: left;
+  border: 1px solid #ccc;
+}
+#noticeList li div {
+  margin: 0 0 0.2em 0;
+}
+#noticeList li div.meta {
+  font-size: 90%;
+  color: #333;
+}
+#noticeList li div.meta a {
+  color: #864612;
+}
+#noticeList li div.meta a.icon {
+  /* display: inline-block; */
+  display: none;
+  margin: 0 0.2em;
+  width: 10px;
+  height: 10px;
+  background-image: url(/images/icons.png);
+  border: 0;
+}
+#noticeList li div.meta a.reply {
+  background-position: left -30px;
+}
+#noticeList li div.meta a.follow {
+  background-position: left 0;
+}
+#noticeList li div.meta a.unfollow {
+  background-position: left -10px;
+}
+#noticeList li div.meta a.clear{
+  background-position: left -20px;
+}
+#noticeList li a.username {
+  font-weight: bold;
+  color: #542;
+  border: 0;
+}
+#noticeList li a.username:hover {
+  background-color: #fff;
+}
+
+/* Posting updates */
+#noticeUpdateText {
+  border: 1px solid #999;
+  width: 100%;
+}
+#noticeUpdateContainer {
+  margin-top: 12px;
+}
+#noticeUpdateHeader {
+  float: left;
+  padding: 0px;
+  margin: 0px;
+}
+#noticeButtonContainer {
+  float: right;
+  padding-left: 1em;
+  padding-top: 4px;
+}
+#submitToLinkContainer {
+  float: right;
+  line-height: 2.8em;
+  font-size: 80%;
+  padding-left: 1em;
+}
+#submitToLinkContainer a {
+  color: #fff;
+  text-decoration: none;
+  border: 0;
+}
+#submitToLinkContainer a:hover {
+}
+#submitThrobberContainer {
+  display: none;
+  float: right;
+  line-height: 1.8em;
+}
+#throbberContainer {
+  padding-right: 0.1em;
+  float: right;
+}
+#noticeLengthPrompt {
+  color: #ece7d6;
+  font-weight: bold;
+  float: left;
+}
+#loadingPrompt {
+  margin-top: 12px;
+  height: 4em;
+  line-height: 4em;
+  width: 100%;
+  color: #666;
+  text-align: center;
+  vertical-align: middle;
+}
+#submitToList {
+  overflow: auto;
+  height: 140px;
+  text-align: left;
+}
+#submitToList div {
+  font-size: 80%;
+  cursor: pointer;
+}
+#notificationsContainer {
+}
+.notificationBox {
+  min-height: 120px;
+  font-size: 80%;
+  color: #222;
+  border: 1px solid #dca;
+  background-image: url(/images/nasfulia_notifications_bg.png);
+  background-repeat: repeat-x;
+  background-position: top left;
+  background-color: #fff;
+  padding: 0.6em;
+  margin-bottom: 1.2em;
+}
+.separator {
+  color: #aaa;
+}
+
+

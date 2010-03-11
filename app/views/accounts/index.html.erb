@@ -1,0 +1,68 @@
+<%
+services = Service::registered_modules  
+login = current_user.login
+%>
+<a href="/home">Home</a> |
+<a href="/users/<%= login %>/accounts/new">New Account</a>
+
+<h1>Accounts for <%= login %></h1>
+
+<% if @accounts.length == 0 %>
+(You currently have no social network accounts saved.)
+<% else %>
+<table>
+<% 
+@accounts.each do |a|
+  puts a.network_id
+  service_cfg = services[a.network_id]::config 
+  if service_cfg[:password_url]
+    password_url = '<a href="' + service_cfg[:password_url] + '">[WTF?]</a>'
+  end
+%>
+  <tr>
+    <td style="padding-bottom: 12px;">
+      <%= service_cfg[:display] %> (<%= a.network_id %>)
+      <form id="account_form_delete_<%= a.id %>"
+        method="post" action="/users/<%= current_user.login
+          %>/accounts/<%= a.id %>">
+        <input type="submit" id="account_form_submit_delete_<%= a.id %>"
+          name="account[submit]" value="Delete"/>
+        <input type="hidden" id="_method_<%= a.id %>"
+          name="_method" value="DELETE"/>
+      </form>
+      <form id="account_form_update_<%= a.id %>"
+        method="post" action="/users/<%= current_user.login
+          %>/accounts/<%= a.id %>">
+        <div>
+          <%= service_cfg[:username_name] %>
+        </div>
+        <div>
+          <input type="text" id="account_username"
+            name="account[username]" value="<%= a.username %>"/>
+        </div>
+        <div>
+          <%= service_cfg[:password_name] %>
+          <%= password_url %>
+        </div>
+        <div>
+          <input type="password" id="account_password"
+            name="account[password]" value=""/>
+        </div>
+        <div>
+          <input type="checkbox" id="account_disabled"
+            name="account[disabled]" value="true"<%= ' checked' if a.disabled %>/>&nbsp;disabled
+        </div>
+        <div>
+          <input type="submit" id="account_submit_update_<%= a.id %>"
+            name="account[submit]" value="Save"/>
+        </div>
+        <input type="hidden" id="_method_<%= a.id %>"
+          name="_method" value="PUT"/>
+      </form>
+    </td>
+  </tr>
+<%
+end
+%>
+</table>
+<% end %>

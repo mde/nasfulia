@@ -1,0 +1,57 @@
+<%
+services = Service::registered_modules
+items = current_user.tracks
+login = current_user.login
+%>
+<a href="/home">Home</a> |
+<a href="/users/<%= login %>/tracks/new">New Track Term</a>
+
+<h1>Track terms for <%= login %></h1>
+
+<% if items.length == 0 %>
+(You currently have no track terms saved.)
+<% else %>
+<table>
+<%
+items.each do |item|
+  service_cfg = services[item.network_id]::config
+%>
+  <tr>
+    <td style="padding-bottom: 12px;">
+      <%= service_cfg[:display] %> (<%= item.network_id %>)
+      <form id="track_form_delete_<%= item.id %>"
+        method="post" action="/users/<%= current_user.login
+          %>/tracks/<%= item.id %>">
+        <input type="submit" id="track_form_submit_delete_<%= item.id %>"
+          name="track[submit]" value="Delete"/>
+        <input type="hidden" id="_method_<%= item.id %>"
+          name="_method" value="DELETE"/>
+      </form>
+      <form id="track_form_update_<%= item.id %>"
+        method="post" action="/users/<%= current_user.login
+          %>/tracks/<%= item.id %>">
+        <div>
+          Track Term
+        </div>
+        <div>
+          <input type="text" id="track_text"
+            name="track[text]" value="<%= item.text %>"/>
+        </div>
+        <div>
+          <input type="checkbox" id="track_disabled"
+            name="track[disabled]" value="true"<%= ' checked' if item.disabled %>/>&nbsp;disabled
+        </div>
+        <div>
+          <input type="submit" id="track_submit_update_<%= item.id %>"
+            name="track[submit]" value="Save"/>
+        </div>
+        <input type="hidden" id="_method_<%= item.id %>"
+          name="_method" value="PUT"/>
+      </form>
+    </td>
+  </tr>
+<%
+end
+%>
+</table>
+<% end %>

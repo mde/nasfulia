@@ -1,0 +1,28 @@
+<%
+services = Service::registered_modules
+# Only Twitter track is currently supported
+service = services['http://twitter.com/']
+cfg = service ? service::config : cfg
+%>
+
+<h1>Add a new track term</h1>
+
+<p>
+  <form id="track_form" method="post" action="/users/<%= current_user.login %>/tracks">
+    <div>
+      Social Network: (Only Twitter currently supported)
+    </div>
+    <div>
+      <input type="hidden" id="track_network_id" name="track[network_id]" value="http://twitter.com/">
+    </div>
+    <div>
+      Text to Track 
+    </div>
+    <div>
+      <input type="text" id="track_text" name="track[text]" value=""/>
+    </div>
+    <div>
+      <input type="submit" id="track_submit" name="track[submit]" value="Save"/>
+    </div>
+  </form>
+</p>
